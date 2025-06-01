@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +8,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Filter, Users, Loader2, Heart, MessageCircle, Eye } from "lucide-react";
 import { useCreators } from "@/hooks/useCreators";
 import { CreatorSearchParams } from "@/lib/services/creatorService";
+import { debounce } from "lodash";
 
 const DiscoverInfluencer = () => {
   const [searchParams, setSearchParams] = useState<CreatorSearchParams>({
     search: "",
-    limit: 20,
+    platform: undefined,
+    niche: undefined,
+    min_followers: undefined,
+    max_followers: undefined,
+    country: undefined,
+    language: undefined,
+    min_engagement: undefined,
+    limit: 40,
     offset: 0
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -22,10 +29,58 @@ const DiscoverInfluencer = () => {
 
   // Fetch creators when search params change
   useEffect(() => {
+    console.log('Search params changed:', searchParams);
     fetchCreators(searchParams);
   }, [searchParams, fetchCreators]);
 
+  // Add debug log for creators data
+  useEffect(() => {
+    console.log('Creators data updated:', creators);
+  }, [creators]);
+
+  const handleFilterChange = (key: keyof CreatorSearchParams, value: string | number | undefined) => {
+    console.log('Filter changed:', key, value);
+    
+    // Validate and transform the value based on the key
+    let processedValue: string | number | undefined = value;
+    
+    if (value === '') {
+      processedValue = undefined;
+    } else if (key === 'min_followers' || key === 'max_followers') {
+      processedValue = value ? Number(value) : undefined;
+      if (processedValue !== undefined && isNaN(processedValue)) {
+        console.warn(`Invalid number for ${key}:`, value);
+        return;
+      }
+    } else if (key === 'min_engagement') {
+      processedValue = value ? Number(value) : undefined;
+      if (processedValue !== undefined && (isNaN(processedValue) || processedValue < 0 || processedValue > 100)) {
+        console.warn(`Invalid engagement rate for ${key}:`, value);
+        return;
+      }
+    }
+
+    setSearchParams(prev => {
+      const newParams = {
+        ...prev,
+        [key]: processedValue,
+        offset: 0 // Reset pagination when filters change
+      };
+      console.log('New search params:', newParams);
+      return newParams;
+    });
+  };
+
+  // Add a debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      handleSearch(value);
+    }, 300),
+    []
+  );
+
   const handleSearch = (value: string) => {
+    console.log('Search value changed:', value);
     setSearchParams(prev => ({
       ...prev,
       search: value,
@@ -33,13 +88,22 @@ const DiscoverInfluencer = () => {
     }));
   };
 
-  const handleFilterChange = (key: keyof CreatorSearchParams, value: string | number) => {
-    setSearchParams(prev => ({
-      ...prev,
-      [key]: value,
-      offset: 0
-    }));
-  };
+  // Add error handling for the API response
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching creators:', error);
+      // You might want to show a toast notification here
+    }
+  }, [error]);
+
+  // Add loading state handling
+  useEffect(() => {
+    if (loading) {
+      console.log('Loading creators...');
+    } else {
+      console.log('Loading complete. Creators:', creators);
+    }
+  }, [loading, creators]);
 
   const formatFollowerCount = (count: number) => {
     if (count >= 1000000) {
@@ -73,9 +137,9 @@ const DiscoverInfluencer = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search influencers by name, niche, or keywords..."
+                    placeholder="Search influencers by name..."
                     value={searchParams.search || ""}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={(e) => debouncedSearch(e.target.value)}
                     className="pl-10 premium-input"
                   />
                 </div>
@@ -91,8 +155,11 @@ const DiscoverInfluencer = () => {
 
               {/* Advanced Filters */}
               {showFilters && (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-4 border-t border-slate-700/50">
-                  <Select onValueChange={(value) => handleFilterChange('platform', value)}>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-700/50">
+                  <Select 
+                    value={searchParams.platform} 
+                    onValueChange={(value) => handleFilterChange('platform', value)}
+                  >
                     <SelectTrigger className="premium-input">
                       <SelectValue placeholder="Platform" />
                     </SelectTrigger>
@@ -104,7 +171,10 @@ const DiscoverInfluencer = () => {
                     </SelectContent>
                   </Select>
 
-                  <Select onValueChange={(value) => handleFilterChange('niche', value)}>
+                  <Select 
+                    value={searchParams.niche}
+                    onValueChange={(value) => handleFilterChange('niche', value)}
+                  >
                     <SelectTrigger className="premium-input">
                       <SelectValue placeholder="Niche" />
                     </SelectTrigger>
@@ -118,21 +188,26 @@ const DiscoverInfluencer = () => {
                     </SelectContent>
                   </Select>
 
-                  <Input
-                    placeholder="Min Followers"
-                    type="number"
-                    onChange={(e) => handleFilterChange('min_followers', parseInt(e.target.value) || 0)}
-                    className="premium-input"
-                  />
+                  <Select 
+                    value={searchParams.language}
+                    onValueChange={(value) => handleFilterChange('language', value)}
+                  >
+                    <SelectTrigger className="premium-input">
+                      <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                      <SelectItem value="fr">French</SelectItem>
+                      <SelectItem value="de">German</SelectItem>
+                      <SelectItem value="pt">Portuguese</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                  <Input
-                    placeholder="Max Followers"
-                    type="number"
-                    onChange={(e) => handleFilterChange('max_followers', parseInt(e.target.value) || 0)}
-                    className="premium-input"
-                  />
-
-                  <Select onValueChange={(value) => handleFilterChange('country', value)}>
+                  <Select 
+                    value={searchParams.country}
+                    onValueChange={(value) => handleFilterChange('country', value)}
+                  >
                     <SelectTrigger className="premium-input">
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
@@ -142,6 +217,50 @@ const DiscoverInfluencer = () => {
                       <SelectItem value="CA">Canada</SelectItem>
                       <SelectItem value="AU">Australia</SelectItem>
                       <SelectItem value="DE">Germany</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Input
+                    placeholder="Min Followers"
+                    type="number"
+                    min="0"
+                    value={searchParams.min_followers || ""}
+                    onChange={(e) => handleFilterChange('min_followers', e.target.value ? parseInt(e.target.value) : undefined)}
+                    className="premium-input"
+                  />
+
+                  <Input
+                    placeholder="Max Followers"
+                    type="number"
+                    min="0"
+                    value={searchParams.max_followers || ""}
+                    onChange={(e) => handleFilterChange('max_followers', e.target.value ? parseInt(e.target.value) : undefined)}
+                    className="premium-input"
+                  />
+
+                  <Input
+                    placeholder="Min Engagement Rate (%)"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={searchParams.min_engagement || ""}
+                    onChange={(e) => handleFilterChange('min_engagement', e.target.value ? parseFloat(e.target.value) : undefined)}
+                    className="premium-input"
+                  />
+
+                  <Select 
+                    value={searchParams.limit?.toString()}
+                    onValueChange={(value) => handleFilterChange('limit', parseInt(value))}
+                  >
+                    <SelectTrigger className="premium-input">
+                      <SelectValue placeholder="Results per page" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10 per page</SelectItem>
+                      <SelectItem value="20">20 per page</SelectItem>
+                      <SelectItem value="50">50 per page</SelectItem>
+                      <SelectItem value="100">100 per page</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -160,14 +279,14 @@ const DiscoverInfluencer = () => {
           </CardTitle>
           <CardDescription>
             {loading ? (
-              <div className="flex items-center gap-2">
+              <span className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Searching creators...
-              </div>
+              </span>
             ) : error ? (
-              <div className="text-red-500">Error loading creators: {error.message}</div>
+              <span className="text-red-500">Error loading creators: {error.message}</span>
             ) : (
-              `Found ${creators?.total || 0} creators matching your criteria`
+              <span>Found {creators?.creators?.length || 0} creators matching your criteria</span>
             )}
           </CardDescription>
         </CardHeader>
@@ -202,64 +321,71 @@ const DiscoverInfluencer = () => {
                       Error loading creators: {error.message}
                     </TableCell>
                   </TableRow>
-                ) : creators?.items?.length === 0 ? (
+                ) : !creators?.creators || creators.creators.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No creators found matching your criteria
                     </TableCell>
                   </TableRow>
-                ) : creators?.items?.map((creator: any) => (
-                  <TableRow 
-                    key={creator.id} 
-                    className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
-                  >
-                    <TableCell>
-                      <img
-                        src={creator.avatar || `https://ui-avatars.com/api/?name=${creator.name}&background=6366f1&color=fff`}
-                        alt={creator.name}
-                        className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-lg"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium text-foreground">{creator.name}</div>
-                        <div className="text-sm text-muted-foreground">@{creator.username || creator.handle}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="border-slate-600 capitalize">
-                        {creator.platform}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="border-slate-600">
-                        {creator.niche}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatFollowerCount(creator.followers_count)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`${getEngagementColor(creator.engagement_rate)} text-white shadow-lg`}>
-                        {creator.engagement_rate?.toFixed(1)}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {creator.country}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="hover-glow">
-                          <Heart className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" className="premium-button">
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          Contact
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                ) : (
+                  creators.creators.map((creator) => {
+                    // Add console log to debug each creator
+                    console.log('Rendering creator:', creator);
+                    
+                    return (
+                      <TableRow 
+                        key={creator.id} 
+                        className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
+                      >
+                        <TableCell>
+                          <img
+                            src={creator.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
+                            alt={creator.name}
+                            className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-lg"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium text-foreground">{creator.name}</div>
+                            <div className="text-sm text-muted-foreground">@{creator.channel_name || creator.handle || 'N/A'}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="border-slate-600 capitalize">
+                            {creator.platform || 'N/A'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="border-slate-600">
+                            {creator.niche || 'N/A'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {creator.followers_count}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${getEngagementColor(creator.engagement_rate || 0)} text-white shadow-lg`}>
+                            {(creator.engagement_rate || 0).toFixed(1)}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {creator.country || 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" className="hover-glow">
+                              <Heart className="w-4 h-4" />
+                            </Button>
+                            <Button size="sm" className="premium-button">
+                              <MessageCircle className="w-4 h-4 mr-1" />
+                              Contact
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>

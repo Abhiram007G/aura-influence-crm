@@ -19,11 +19,14 @@ export const useCreators = (): UseCreatorsReturn => {
 
   const fetchCreators = useCallback(async (params: CreatorSearchParams) => {
     try {
+      console.log('useCreators: Starting fetch with params:', params);
       setLoading(true);
       setError(null);
       const data = await getCreators(params);
+      console.log('useCreators: Received data:', data);
       setCreators(data);
     } catch (err) {
+      console.error('useCreators: Error occurred:', err);
       setError(err instanceof Error ? err : new Error('An error occurred'));
       setCreators(null);
     } finally {

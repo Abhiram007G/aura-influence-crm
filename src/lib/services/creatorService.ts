@@ -16,9 +16,41 @@ export interface CreatorSearchParams {
 
 // Type for the API response
 export interface CreatorResponse {
-  // Add specific response type properties here once we know the exact structure
-  [key: string]: any;
+  total: number;
+  creators: Array<{
+    id: string;
+    name: string;
+    email: string;
+    platform: string;
+    channel_name?: string;
+    handle?: string;
+    profile_image?: string;
+    followers_count: string;
+    followers_count_numeric: number;
+    engagement_rate: number;
+    country: string;
+    niche: string;
+    language: string;
+    about?: string;
+    avg_views?: number;
+    collaboration_rate?: number;
+    rating?: number;
+    match_percentage?: number;
+    created_at: string;
+    updated_at: string;
+  }>;
+  filters_applied: {
+    niche?: string;
+    platform?: string;
+    size?: string;
+  };
 }
+
+// Common headers for all requests
+const defaultHeaders = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+};
 
 /**
  * Fetches creators based on search parameters
@@ -32,7 +64,12 @@ export const getCreators = async (params: CreatorSearchParams): Promise<CreatorR
   // Add all non-undefined parameters to the search params
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined) {
-      searchParams.append(key, value.toString());
+      // For search parameter, ensure it's properly encoded
+      if (key === 'search') {
+        searchParams.append('name', value.toString());
+      } else {
+        searchParams.append(key, value.toString());
+      }
     }
   });
 
@@ -40,16 +77,29 @@ export const getCreators = async (params: CreatorSearchParams): Promise<CreatorR
   const apiUrl = `${config.apiBaseUrl}/api/v1/creators/?${searchParams.toString()}`;
 
   try {
-    const response = await fetch(apiUrl);
+    console.log('Fetching creators from:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
+      headers: defaultHeaders,
+    });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => null);
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorData?.message || response.statusText}`
+      );
     }
     
     const data = await response.json();
+    console.log('Creators fetched successfully:', data);
     return data;
   } catch (error) {
     console.error('Error fetching creators:', error);
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error(
+        `Unable to connect to the server at ${apiUrl}. Please check if the server is running and accessible.`
+      );
+    }
     throw error;
   }
 }; 
