@@ -5,10 +5,33 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Users, Loader2, Heart, MessageCircle, Eye } from "lucide-react";
+import { Search, Filter, Users, Loader2, Heart, MessageCircle, Eye, Plus } from "lucide-react";
 import { useCreators } from "@/hooks/useCreators";
 import { CreatorSearchParams } from "@/lib/services/creatorService";
 import { debounce } from "lodash";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+
+// Campaign type
+interface Campaign {
+  id: string;
+  name: string;
+  brand: string;
+  status: "active" | "planning" | "completed" | "paused";
+  budget: number;
+  influencersCount: number;
+  startDate: string;
+  product_name: string;
+  brand_name: string;
+}
 
 const DiscoverInfluencer = () => {
   const [searchParams, setSearchParams] = useState<CreatorSearchParams>({
@@ -24,6 +47,11 @@ const DiscoverInfluencer = () => {
     offset: 0
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState<string | null>(null);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { creators, loading, error, fetchCreators } = useCreators();
 
@@ -119,6 +147,62 @@ const DiscoverInfluencer = () => {
     if (rate >= 3) return "bg-gradient-to-r from-blue-500 to-cyan-500";
     if (rate >= 1) return "bg-gradient-to-r from-yellow-500 to-orange-500";
     return "bg-gradient-to-r from-red-500 to-pink-500";
+  };
+
+  // Fetch campaigns
+  const fetchCampaigns = async () => {
+    try {
+      setLoadingCampaigns(true);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/campaigns/`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch campaigns');
+      }
+      const data = await response.json();
+      setCampaigns(data);
+    } catch (err) {
+      console.error('Error fetching campaigns:', err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch campaigns. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingCampaigns(false);
+    }
+  };
+
+  // Add creator to campaign
+  const addCreatorToCampaign = async (campaignId: string) => {
+    if (!selectedCreator) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/outreach/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campaign_id: campaignId,
+          creator_id: selectedCreator
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add creator to campaign');
+      }
+
+      toast({
+        title: "Success",
+        description: "Creator added to campaign successfully",
+      });
+    } catch (err) {
+      console.error('Error adding creator to campaign:', err);
+      toast({
+        title: "Error",
+        description: "Failed to add creator to campaign. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -372,15 +456,74 @@ const DiscoverInfluencer = () => {
                           {creator.country || 'N/A'}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline" className="hover-glow">
-                              <Heart className="w-4 h-4" />
-                            </Button>
-                            <Button size="sm" className="premium-button">
-                              <MessageCircle className="w-4 h-4 mr-1" />
-                              Contact
-                            </Button>
-                          </div>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="hover-glow"
+                                onClick={() => {
+                                  setSelectedCreator(creator.id);
+                                  fetchCampaigns();
+                                }}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Add to Campaign</DialogTitle>
+                                <DialogDescription>
+                                  Select a campaign to add {creator.name} to
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                {loadingCampaigns ? (
+                                  <div className="flex items-center justify-center py-4">
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                  </div>
+                                ) : campaigns.length === 0 ? (
+                                  <div className="text-center space-y-4">
+                                    <p className="text-muted-foreground">No campaigns available</p>
+                                    <Button
+                                      onClick={() => navigate('/campaigns/new')}
+                                      className="bg-gradient-purple hover:opacity-90 text-white w-full"
+                                    >
+                                      <Plus className="w-4 h-4 mr-2" />
+                                      Create Campaign
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-4">
+                                    <div className="grid gap-2">
+                                      {campaigns.map((campaign) => (
+                                        <Button
+                                          key={campaign.id}
+                                          variant="outline"
+                                          className="justify-start h-auto py-3 px-4"
+                                          onClick={() => addCreatorToCampaign(campaign.id)}
+                                        >
+                                          <div className="flex flex-col items-start text-left">
+                                            <span className="font-medium text-foreground">{campaign.product_name}</span>
+                                            <span className="text-sm font-semibold gradient-text">{campaign.brand_name}</span>
+                                          </div>
+                                        </Button>
+                                      ))}
+                                    </div>
+                                    <div className="pt-2 border-t border-slate-700/50">
+                                      <Button
+                                        className="w-full bg-gradient-purple hover:opacity-90 text-white"
+                                        onClick={() => navigate('/campaigns/new')}
+                                      >
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Create New Campaign
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </TableCell>
                       </TableRow>
                     );
