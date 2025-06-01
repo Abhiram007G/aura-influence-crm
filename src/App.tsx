@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
 import CampaignNew from "./pages/CampaignNew";
 import InfluencerDiscovery from "./pages/InfluencerDiscovery";
+import DiscoverInfluencer from "./pages/DiscoverInfluencer";
 import IRM from "./pages/IRM";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/campaigns" element={<Campaigns />} />
                 <Route path="/campaigns/new" element={<CampaignNew />} />
                 <Route path="/campaigns/:id/influencers" element={<InfluencerDiscovery />} />
+                <Route path="/discover" element={<DiscoverInfluencer />} />
                 <Route path="/irm" element={<IRM />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

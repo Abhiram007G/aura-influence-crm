@@ -1,5 +1,5 @@
 
-import { BarChart3, Megaphone, Users, Calendar } from "lucide-react";
+import { BarChart3, Megaphone, Users, Calendar, Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -23,6 +23,11 @@ const items = [
     title: "Campaigns",
     url: "/campaigns",
     icon: Megaphone,
+  },
+  {
+    title: "Discover Influencers",
+    url: "/discover",
+    icon: Search,
   },
   {
     title: "Influencer Manager",
