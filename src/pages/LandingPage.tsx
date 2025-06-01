@@ -30,7 +30,8 @@ const LandingPage = () => {
           <div className="relative pt-[56.25%] w-full">
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src="https://www.loom.com/embed/75ed1056dd494cd897a8d8ddb4112991?sid=617052ee-5b8e-42f9-a936-055a0275cda4"
+              src={import.meta.env.VITE_LOOM_LINK}
+              
               allowFullScreen
             />
           </div>
