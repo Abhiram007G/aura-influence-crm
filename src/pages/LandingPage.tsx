@@ -59,7 +59,7 @@ const LandingPage = () => {
               <a href="#how-it-works" className="text-slate-300 hover:text-white transition-colors hover:scale-105 transform">How it Works</a>
               <a href="#pricing" className="text-slate-300 hover:text-white transition-colors hover:scale-105 transform">Pricing</a>
               <Button 
-                onClick={() => navigate("/login")} 
+                onClick={() => navigate("/dashboard")} 
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300"
               >
                 Get Started
