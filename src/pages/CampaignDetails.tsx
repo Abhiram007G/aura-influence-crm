@@ -34,6 +34,20 @@ const CampaignDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [findingInfluencers, setFindingInfluencers] = useState(false);
 
+  const fetchOutreachCount = async (campaignId: string) => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/api/v1/outreach/campaign/${campaignId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch outreach count');
+      }
+      const data = await response.json();
+      return data.length;
+    } catch (error) {
+      console.error('Error fetching outreach count:', error);
+      return 0;
+    }
+  };
+
   useEffect(() => {
     const fetchCampaign = async () => {
       if (!id) return;
@@ -47,7 +61,14 @@ const CampaignDetails = () => {
         }
         
         const data = await response.json();
-        setCampaign(data);
+        
+        // Fetch outreach count and update the campaign data
+        const outreachCount = await fetchOutreachCount(id);
+        setCampaign({
+          ...data,
+          influencer_count: outreachCount
+        });
+        
         setError(null);
       } catch (err) {
         setError('Failed to fetch campaign details. Please try again later.');
@@ -79,6 +100,14 @@ const CampaignDetails = () => {
       
       // Store the results in localStorage to pass to the influencers page
       localStorage.setItem('similarInfluencers', JSON.stringify(response));
+      
+      // Update the influencer count based on the response
+      if (campaign && response.matches) {
+        setCampaign({
+          ...campaign,
+          influencer_count: response.matches.length
+        });
+      }
       
       // Navigate to the influencers page
       navigate(`/campaigns/${id}/influencers`);
@@ -270,7 +299,7 @@ const CampaignDetails = () => {
                 ) : (
                   <>
                     <Users className="w-4 h-4 mr-2" />
-                    Find Influencers
+                    AI Influencer Match
                   </>
                 )}
               </Button>

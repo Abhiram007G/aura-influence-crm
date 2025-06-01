@@ -359,7 +359,7 @@ const CampaignIRM = () => {
                   return (
                     <div
                       key={entry.id}
-                      onClick={() => setSelectedEntry(entry)}
+                      onClick={() => navigate(`/conversation/${entry.id}`)}
                       className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
                     >
                       {creator?.profile_image ? (

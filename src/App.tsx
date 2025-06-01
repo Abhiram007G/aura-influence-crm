@@ -16,6 +16,7 @@ import IRM from "./pages/IRM";
 import NotFound from "./pages/NotFound";
 import CampaignInfluencers from "./pages/CampaignInfluencers";
 import CampaignIRM from "./pages/CampaignIRM";
+import ConversationDetails from "./pages/ConversationDetails";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/campaigns/new" element={<CampaignNew />} />
                 <Route path="/campaigns/:id/influencers" element={<CampaignInfluencers />} />
                 <Route path="/campaign/:id/irm" element={<CampaignIRM />} />
+                <Route path="/conversation/:id" element={<ConversationDetails />} />
                 <Route path="/discover" element={<DiscoverInfluencer />} />
                 <Route path="/irm" element={<IRM />} />
                 <Route path="*" element={<NotFound />} />
