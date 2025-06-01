@@ -1,42 +1,100 @@
-
+import { useEffect, useState } from "react";
 import { BarChart3, Megaphone, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getCampaigns } from "@/lib/services/campaignService";
+import { getOutreachEntries } from "@/lib/services/outreachService";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
+  // State for real data
+  const [campaigns, setCampaigns] = useState([]);
+  const [outreachEntries, setOutreachEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [campaignsData, outreachData] = await Promise.all([
+          getCampaigns(),
+          getOutreachEntries()
+        ]);
+        setCampaigns(campaignsData);
+        setOutreachEntries(outreachData);
+        setError(null);
+      } catch (err) {
+        setError("Failed to fetch dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Calculate stats
+  const activeCampaigns = campaigns.length;
+  const recentCampaigns = [...campaigns]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 3);
+  const influencersContacted = outreachEntries.length;
+  const roi = campaigns
+    .filter(c => c.status === "completed")
+    .reduce((sum, c) => sum + (c.total_budget || 0), 0);
+
   const stats = [
     {
       title: "Active Campaigns",
-      value: "12",
-      change: "+2 this week",
+      value: activeCampaigns,
+      change: `Total` ,
       icon: Megaphone,
       color: "text-purple-400"
     },
     {
       title: "Influencers Contacted",
-      value: "284",
-      change: "+12% from last month",
+      value: influencersContacted,
+      change: `Total`,
       icon: Users,
       color: "text-blue-400"
     },
     {
       title: "Response Rate",
-      value: "68%",
-      change: "+5% from last month",
+      value: "-",
+      change: "-",
       icon: TrendingUp,
       color: "text-cyan-400"
     },
     {
       title: "Total ROI",
-      value: "$24.5K",
-      change: "+18% from last month",
+      value: `$${roi.toLocaleString()}`,
+      change: `Completed Campaigns`,
       icon: BarChart3,
       color: "text-green-400"
     }
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -84,22 +142,18 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { name: "Summer Collection Launch", status: "Active", influencers: 15 },
-                { name: "Brand Awareness Q4", status: "Planning", influencers: 8 },
-                { name: "Product Review Campaign", status: "Completed", influencers: 22 }
-              ].map((campaign, index) => (
+              {recentCampaigns.map((campaign, index) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border">
                   <div>
-                    <p className="font-medium text-foreground">{campaign.name}</p>
-                    <p className="text-sm text-muted-foreground">{campaign.influencers} influencers</p>
+                    <p className="font-medium text-foreground">{campaign.product_name}</p>
+                    <p className="text-sm text-muted-foreground">Budget: ${campaign.total_budget}</p>
                   </div>
                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    campaign.status === 'Active' ? 'bg-green-500/20 text-green-400' :
-                    campaign.status === 'Planning' ? 'bg-yellow-500/20 text-yellow-400' :
+                    campaign.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                    campaign.status === 'draft' ? 'bg-yellow-500/20 text-yellow-400' :
                     'bg-blue-500/20 text-blue-400'
                   }`}>
-                    {campaign.status}
+                    {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
                   </div>
                 </div>
               ))}
