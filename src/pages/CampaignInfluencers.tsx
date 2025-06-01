@@ -178,24 +178,28 @@ const CampaignInfluencers = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/campaigns/${id}`)}
-          className="border-border hover:bg-secondary/20"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Campaign
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Similar Influencers</h1>
-          {campaign && (
-            <div className="text-muted-foreground">
-              <p>Campaign: {campaign.product_name} by {campaign.brand_name}</p>
-              <p>Found {similarInfluencers.total_matches} influencers matching your campaign</p>
-            </div>
-          )}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/campaigns/${id}`)}
+            className="border-border hover:bg-secondary/20"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Campaign
+          </Button>
+        </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">Similar Influencers</h1>
+            {campaign && (
+              <div className="text-muted-foreground">
+                <p>Campaign: {campaign.product_name} by {campaign.brand_name}</p>
+                <p>Found {similarInfluencers.total_matches} influencers matching your campaign</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

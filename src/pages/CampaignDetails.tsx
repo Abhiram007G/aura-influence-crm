@@ -153,17 +153,19 @@ const CampaignDetails = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate('/campaigns')}
-          className="border-border hover:bg-secondary/20"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Campaigns
-        </Button>
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/campaigns')}
+            className="border-border hover:bg-secondary/20"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Campaigns
+          </Button>
+        </div>
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold gradient-text">{campaign.product_name}</h1>
             <p className="text-muted-foreground">{campaign.brand_name}</p>

@@ -30,6 +30,28 @@ interface CreatorDetails {
   updated_at: string;
 }
 
+interface ProductDetails {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  target_audience: string;
+  price_range: string;
+  key_features: string[];
+  brand_guidelines: string;
+}
+
+interface BrandDetails {
+  id: string;
+  name: string;
+  industry: string;
+  mission: string;
+  values: string[];
+  target_market: string;
+  brand_voice: string;
+  logo_url: string;
+}
+
 interface OutreachData {
   id: string;
   campaign_id: string;
@@ -108,6 +130,8 @@ const CampaignIRM = () => {
   const { toast } = useToast();
   const [outreachData, setOutreachData] = useState<OutreachData[]>([]);
   const [creatorDetails, setCreatorDetails] = useState<Record<string, CreatorDetails>>({});
+  const [productDetails, setProductDetails] = useState<ProductDetails | null>(null);
+  const [brandDetails, setBrandDetails] = useState<BrandDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -118,29 +142,37 @@ const CampaignIRM = () => {
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
   useEffect(() => {
-    const fetchOutreachData = async () => {
+    const fetchData = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
-        const response = await fetch(`${config.apiBaseUrl}/api/v1/outreach/campaign/${id}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch outreach data');
-        }
-        
-        const data = await response.json();
-        setOutreachData(data);
-        setError(null);
+        // Fetch outreach data
+        const outreachResponse = await fetch(`${config.apiBaseUrl}/api/v1/outreach/campaign/${id}`);
+        if (!outreachResponse.ok) throw new Error('Failed to fetch outreach data');
+        const outreachData = await outreachResponse.json();
+        setOutreachData(outreachData);
 
-        // Fetch creator details for each unique creator
-        const uniqueCreatorIds = [...new Set(data.map((entry: OutreachData) => entry.creator_id))];
+        // Fetch product details
+        const productResponse = await fetch(`${config.apiBaseUrl}/api/v1/products/${id}`);
+        if (productResponse.ok) {
+          const productData = await productResponse.json();
+          setProductDetails(productData);
+        }
+
+        // Fetch brand details
+        const brandResponse = await fetch(`${config.apiBaseUrl}/api/v1/brands/${id}`);
+        if (brandResponse.ok) {
+          const brandData = await brandResponse.json();
+          setBrandDetails(brandData);
+        }
+
+        // Fetch creator details
+        const uniqueCreatorIds = [...new Set(outreachData.map((entry: OutreachData) => entry.creator_id))];
         const creatorDetailsPromises = uniqueCreatorIds.map(async (creatorId) => {
           try {
             const creatorResponse = await fetch(`${config.apiBaseUrl}/api/v1/creators/${creatorId}`);
-            if (!creatorResponse.ok) {
-              throw new Error(`Failed to fetch creator ${creatorId}`);
-            }
+            if (!creatorResponse.ok) throw new Error(`Failed to fetch creator ${creatorId}`);
             const creatorData = await creatorResponse.json();
             return [creatorId, creatorData];
           } catch (error) {
@@ -154,12 +186,13 @@ const CampaignIRM = () => {
           creatorResults.filter(([_, data]) => data !== null)
         );
         setCreatorDetails(creatorDetailsMap);
+        setError(null);
       } catch (err) {
-        setError('Failed to fetch outreach data. Please try again later.');
-        console.error('Error fetching outreach data:', err);
+        setError('Failed to fetch data. Please try again later.');
+        console.error('Error fetching data:', err);
         toast({
           title: "Error",
-          description: "Failed to fetch outreach data. Please try again.",
+          description: "Failed to fetch data. Please try again.",
           variant: "destructive",
         });
       } finally {
@@ -167,7 +200,7 @@ const CampaignIRM = () => {
       }
     };
 
-    fetchOutreachData();
+    fetchData();
   }, [id, toast]);
 
   const getStatusColor = (status: string) => {
@@ -309,7 +342,7 @@ const CampaignIRM = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -320,253 +353,211 @@ const CampaignIRM = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Campaign
           </Button>
+        </div>
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold gradient-text">Campaign Outreach Management</h1>
+            <h1 className="text-3xl font-bold gradient-text">{productDetails?.name || 'Campaign Outreach Management'}</h1>
             <p className="text-muted-foreground">
               Track and manage your influencer outreach and conversations
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search creators or status..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-secondary/20 border-border w-80"
-            />
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search creators or status..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-secondary/20 border-border w-80"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      {/* Product and Brand Details Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {productDetails && (
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="gradient-text flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Active Outreach
+                Product Details
               </CardTitle>
-              <CardDescription>
-                {filteredEntries.length} creators in your pipeline
-              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {filteredEntries.map((entry) => {
-                  const creator = creatorDetails[entry.creator_id];
-                  return (
-                    <div
-                      key={entry.id}
-                      onClick={() => navigate(`/conversation/${entry.id}`)}
-                      className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
-                    >
-                      {creator?.profile_image ? (
-                        <img
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${creator.name}`}
-                          alt={creator.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-gradient-purple flex items-center justify-center text-white">
-                          <Users className="w-6 h-6" />
-                        </div>
-                      )}
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {creator?.name || `Creator ${entry.creator_id}`}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {creator?.channel_name || entry.channel}
-                            </p>
-                          </div>
-                          <Badge className={getStatusColor(entry.status)}>
-                            {entry.status}
-                          </Badge>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-muted-foreground">{entry.message_type}</p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              Last contact: {new Date(entry.timestamp).toLocaleDateString()}
-                            </p>
-                          </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCall(entry);
-                              }}
-                              disabled={isCallLoading}
-                              className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                            >
-                              <Phone className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEmail(entry);
-                              }}
-                              disabled={isEmailLoading}
-                              className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                            >
-                              <Mail className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg">{productDetails.name}</h3>
+                  <p className="text-muted-foreground">{productDetails.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Category</p>
+                    <p className="font-medium">{productDetails.category}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Price Range</p>
+                    <p className="font-medium">{productDetails.price_range}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Target Audience</p>
+                    <p className="font-medium">{productDetails.target_audience}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Key Features</p>
+                  <div className="flex flex-wrap gap-2">
+                    {productDetails.key_features.map((feature, index) => (
+                      <Badge key={index} variant="secondary">{feature}</Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </div>
+        )}
 
-        <div>
+        {brandDetails && (
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="gradient-text flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                Conversation Details
+                Brand Details
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {selectedEntry ? (
-                <div className="space-y-4">
-                  {creatorDetails[selectedEntry.creator_id] && (
-                    <div className="mb-4">
-                      <div className="flex items-center gap-3 mb-2">
-                        {creatorDetails[selectedEntry.creator_id].profile_image ? (
-                          <img
-                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedEntry.creator_id}`}
-                            alt={creatorDetails[selectedEntry.creator_id].name}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-full bg-gradient-purple flex items-center justify-center text-white">
-                            <Users className="w-6 h-6" />
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-medium">{creatorDetails[selectedEntry.creator_id].name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {creatorDetails[selectedEntry.creator_id].channel_name}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Followers</p>
-                          <p className="font-medium">{creatorDetails[selectedEntry.creator_id].followers_count}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Engagement Rate</p>
-                          <p className="font-medium">{creatorDetails[selectedEntry.creator_id].engagement_rate}%</p>
-                        </div>
-                      </div>
-                    </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  {brandDetails.logo_url && (
+                    <img
+                      src={brandDetails.logo_url}
+                      alt={brandDetails.name}
+                      className="w-16 h-16 rounded-lg object-contain"
+                    />
                   )}
-
-                  {isAnalysisLoading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                      <span className="ml-2 text-muted-foreground">Loading call analysis...</span>
-                    </div>
-                  ) : callAnalysis ? (
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Call Summary</p>
-                        <p className="text-sm mt-1">{callAnalysis.summary}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Call Duration</p>
-                        <p className="text-sm mt-1">{callAnalysis.duration_seconds} seconds</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Call Status</p>
-                        <p className="text-sm mt-1">{callAnalysis.status}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Interest Level</p>
-                        <p className="text-sm mt-1">{callAnalysis.extracted_data.interest_level}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Collaboration Rate</p>
-                        <p className="text-sm mt-1">{callAnalysis.extracted_data.collaboration_rate}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Contact Info</p>
-                        <p className="text-sm mt-1">{callAnalysis.extracted_data.contact_info}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground">Follow-up Actions</p>
-                        <p className="text-sm mt-1">{callAnalysis.extracted_data.follow_up_actions}</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Evaluation Results</p>
-                        <div className="space-y-2">
-                          {Object.entries(callAnalysis.evaluation_results).map(([key, value]) => (
-                            <div key={key} className="bg-secondary/10 p-3 rounded-lg">
-                              <p className="text-sm font-medium capitalize">{key.replace(/_/g, ' ')}</p>
-                              <p className="text-sm mt-1">Result: {value.result}</p>
-                              <p className="text-sm mt-1 text-muted-foreground">{value.rationale}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Call Transcript</p>
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                          {callAnalysis.transcript.map((message, index) => (
-                            message.message && (
-                              <div key={index} className={`p-2 rounded-lg ${
-                                message.role === 'agent' ? 'bg-secondary/10' : 'bg-primary/10'
-                              }`}>
-                                <p className="text-xs text-muted-foreground mb-1">
-                                  {message.role === 'agent' ? 'Agent' : 'Creator'} • {message.time_in_call_secs}s
-                                </p>
-                                <p className="text-sm">{message.message}</p>
-                              </div>
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-4">
-                      No call analysis available
-                    </p>
-                  )}
+                  <div>
+                    <h3 className="font-semibold text-lg">{brandDetails.name}</h3>
+                    <p className="text-muted-foreground">{brandDetails.industry}</p>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-4">
-                  Select a creator to view conversation details
-                </p>
-              )}
+                <div>
+                  <p className="text-sm text-muted-foreground">Mission</p>
+                  <p className="mt-1">{brandDetails.mission}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Brand Values</p>
+                  <div className="flex flex-wrap gap-2">
+                    {brandDetails.values.map((value, index) => (
+                      <Badge key={index} variant="secondary">{value}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Target Market</p>
+                    <p className="font-medium">{brandDetails.target_market}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Brand Voice</p>
+                    <p className="font-medium">{brandDetails.brand_voice}</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </div>
+        )}
       </div>
+
+      {/* Outreach List */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="gradient-text flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Active Outreach
+          </CardTitle>
+          <CardDescription>
+            {filteredEntries.length} creators in your pipeline
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {filteredEntries.map((entry) => {
+              const creator = creatorDetails[entry.creator_id];
+              return (
+                <div
+                  key={entry.id}
+                  onClick={() => navigate(`/conversation/${entry.id}`)}
+                  className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
+                >
+                  {creator?.profile_image ? (
+                    <img
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${creator.name}`}
+                      alt={creator.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-purple flex items-center justify-center text-white">
+                      <Users className="w-6 h-6" />
+                    </div>
+                  )}
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {creator?.name || `Creator ${entry.creator_id}`}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {creator?.channel_name || entry.channel}
+                        </p>
+                      </div>
+                      <Badge className={getStatusColor(entry.status)}>
+                        {entry.status}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{entry.message_type}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          Last contact: {new Date(entry.timestamp).toLocaleDateString()}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCall(entry);
+                          }}
+                          disabled={isCallLoading}
+                          className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
+                        >
+                          <Phone className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEmail(entry);
+                          }}
+                          disabled={isEmailLoading}
+                          className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
+                        >
+                          <Mail className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
