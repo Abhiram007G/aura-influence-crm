@@ -3,10 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Brain, MessageSquare, Target, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -14,6 +21,22 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-premium-gradient overflow-hidden">
+      {/* Video Modal */}
+      <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Product Demo</DialogTitle>
+          </DialogHeader>
+          <div className="relative pt-[56.25%] w-full">
+            <iframe
+              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              src="https://www.loom.com/embed/75ed1056dd494cd897a8d8ddb4112991?sid=617052ee-5b8e-42f9-a936-055a0275cda4"
+              allowFullScreen
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" />
@@ -89,6 +112,7 @@ const LandingPage = () => {
             <Button 
               variant="outline" 
               className="w-full sm:w-auto text-lg px-8 py-6 border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 transition-all duration-300"
+              onClick={() => setIsVideoModalOpen(true)}
             >
               Watch Demo
             </Button>

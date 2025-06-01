@@ -60,8 +60,8 @@ const Dashboard = () => {
     },
     {
       title: "Response Rate",
-      value: "-",
-      change: "-",
+      value: "200%",
+      change: "20%",
       icon: TrendingUp,
       color: "text-cyan-400"
     },
