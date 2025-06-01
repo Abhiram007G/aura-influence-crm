@@ -3,10 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, DollarSign, Target, Users, Briefcase, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Target, Users, Briefcase, FileText, Loader2, Bot } from "lucide-react";
 import { config } from "@/lib/config";
 import { findSimilarInfluencers, CampaignSimilarityResponse } from "@/lib/services/campaignService";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 interface CampaignDetails {
   id: string;
@@ -33,6 +35,28 @@ const CampaignDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [findingInfluencers, setFindingInfluencers] = useState(false);
+  const [isAutoPilotOpen, setIsAutoPilotOpen] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  const phases = [
+    {
+      title: "Matching Phase",
+      description: "🔍 Scanning the creator universe for your perfect matches...",
+    },
+    {
+      title: "Finding Phase",
+      description: "📍 Locked onto target influencers, initiating contact protocol...",
+    },
+    {
+      title: "Calling Phase",
+      description: "📞 Establishing communication channels with selected creators...",
+    },
+    {
+      title: "Negotiating Phase",
+      description: "🤝 Working our AI magic to craft irresistible partnership deals...",
+    },
+  ];
 
   const fetchOutreachCount = async (campaignId: string) => {
     try {
@@ -80,6 +104,22 @@ const CampaignDetails = () => {
 
     fetchCampaign();
   }, [id]);
+
+  useEffect(() => {
+    if (isAutoPilotOpen) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            setCurrentPhase((phase) => (phase + 1) % phases.length);
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 50);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAutoPilotOpen]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -170,11 +210,55 @@ const CampaignDetails = () => {
             <h1 className="text-3xl font-bold gradient-text">{campaign.product_name}</h1>
             <p className="text-muted-foreground">{campaign.brand_name}</p>
           </div>
-          <Badge className={getStatusColor(campaign.status)}>
-            {campaign.status}
-          </Badge>
+          <div className="flex items-center gap-4">
+            <Button
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white"
+              onClick={() => setIsAutoPilotOpen(true)}
+            >
+              <Bot className="w-4 h-4 mr-2" />
+              Auto Co-Pilot
+            </Button>
+            <Badge className={getStatusColor(campaign.status)}>
+              {campaign.status}
+            </Badge>
+          </div>
         </div>
       </div>
+
+      {/* Auto Pilot Dialog */}
+      <Dialog open={isAutoPilotOpen} onOpenChange={setIsAutoPilotOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold gradient-text">
+              Auto Co-Pilot in Action
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-center">
+                {phases[currentPhase].title}
+              </h3>
+              <p className="text-center text-muted-foreground">
+                {phases[currentPhase].description}
+              </p>
+            </div>
+            
+            <Progress value={progress} className="h-2" />
+            
+            <div className="flex justify-center">
+              <img 
+                src="https://media1.tenor.com/m/1YXq17YXn98AAAAd/chill-dude-chill.gif" 
+                alt="Loading" 
+                className="w-32 h-32 rounded-lg"
+              />
+            </div>
+            
+            <p className="text-center text-sm text-muted-foreground italic">
+              Our AI agents are working on your task. You can close this and come back later - we'll keep the magic happening in the background! ✨
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
