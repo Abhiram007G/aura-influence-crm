@@ -50,16 +50,33 @@ const DiscoverInfluencer = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [selectedCreator, setSelectedCreator] = useState<string | null>(null);
+  const [filteredCreators, setFilteredCreators] = useState<any[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const { creators, loading, error, fetchCreators } = useCreators();
 
-  // Fetch creators when search params change
+  // Fetch creators when search params change (excluding search term)
   useEffect(() => {
-    console.log('Search params changed:', searchParams);
-    fetchCreators(searchParams);
-  }, [searchParams, fetchCreators]);
+    const { search, ...apiParams } = searchParams;
+    console.log('API params changed:', apiParams);
+    fetchCreators(apiParams);
+  }, [searchParams.platform, searchParams.niche, searchParams.min_followers, 
+      searchParams.max_followers, searchParams.country, searchParams.language, 
+      searchParams.min_engagement, searchParams.limit, searchParams.offset, fetchCreators]);
+
+  // Filter creators based on search term
+  useEffect(() => {
+    if (!creators?.creators) return;
+
+    const searchTerm = searchParams.search.toLowerCase();
+    const filtered = creators.creators.filter(creator => 
+      creator.name.toLowerCase().includes(searchTerm) ||
+      (creator.channel_name && creator.channel_name.toLowerCase().includes(searchTerm)) ||
+      (creator.handle && creator.handle.toLowerCase().includes(searchTerm))
+    );
+    setFilteredCreators(filtered);
+  }, [creators, searchParams.search]);
 
   // Add debug log for creators data
   useEffect(() => {
@@ -99,22 +116,22 @@ const DiscoverInfluencer = () => {
     });
   };
 
-  // Add a debounced search handler
-  const debouncedSearch = useCallback(
-    debounce((value: string) => {
-      handleSearch(value);
-    }, 300),
-    []
-  );
-
+  // Update search handler to only update search term
   const handleSearch = (value: string) => {
     console.log('Search value changed:', value);
     setSearchParams(prev => ({
       ...prev,
-      search: value,
-      offset: 0
+      search: value
     }));
   };
+
+  // Remove debounced search since we're filtering client-side
+  const debouncedSearch = useCallback(
+    (value: string) => {
+      handleSearch(value);
+    },
+    []
+  );
 
   // Add error handling for the API response
   useEffect(() => {
@@ -370,7 +387,7 @@ const DiscoverInfluencer = () => {
             ) : error ? (
               <span className="text-red-500">Error loading creators: {error.message}</span>
             ) : (
-              <span>Found {creators?.creators?.length || 0} creators matching your criteria</span>
+              <span>Found {filteredCreators.length} creators matching your criteria</span>
             )}
           </CardDescription>
         </CardHeader>
@@ -405,14 +422,14 @@ const DiscoverInfluencer = () => {
                       Error loading creators: {error.message}
                     </TableCell>
                   </TableRow>
-                ) : !creators?.creators || creators.creators.length === 0 ? (
+                ) : filteredCreators.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No creators found matching your criteria
                     </TableCell>
                   </TableRow>
                 ) : (
-                  creators.creators.map((creator) => {
+                  filteredCreators.map((creator) => {
                     // Add console log to debug each creator
                     console.log('Rendering creator:', creator);
                     
