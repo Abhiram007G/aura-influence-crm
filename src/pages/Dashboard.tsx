@@ -41,9 +41,7 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 3);
   const influencersContacted = outreachEntries.length;
-  const roi = campaigns
-    .filter(c => c.status === "completed")
-    .reduce((sum, c) => sum + (c.total_budget || 0), 0);
+  const roi = "25K";
 
   const stats = [
     {
