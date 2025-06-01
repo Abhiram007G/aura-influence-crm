@@ -423,9 +423,9 @@ const DiscoverInfluencer = () => {
                       >
                         <TableCell>
                           <img
-                            src={creator.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
+                            src={creator.profile_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
                             alt={creator.name}
-                            className="w-10 h-10 rounded-full border-2 border-slate-600 shadow-lg"
+                            className="w-10 h-10 rounded-full object-cover  shadow-lg"
                           />
                         </TableCell>
                         <TableCell>

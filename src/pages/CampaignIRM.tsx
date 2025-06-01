@@ -490,7 +490,7 @@ const CampaignIRM = () => {
                 >
                   {creator?.profile_image ? (
                     <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${creator.name}`}
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
                       alt={creator.name}
                       className="w-12 h-12 rounded-full object-cover"
                     />
