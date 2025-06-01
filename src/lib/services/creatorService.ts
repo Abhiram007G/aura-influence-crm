@@ -1,3 +1,4 @@
+
 import { config } from '../config';
 
 // Types for the creator search parameters
@@ -14,31 +15,41 @@ export interface CreatorSearchParams {
   offset?: number;
 }
 
+// Individual creator type
+export interface Creator {
+  id: string;
+  name: string;
+  email: string;
+  platform: string;
+  channel_name?: string;
+  handle?: string;
+  profile_image?: string;
+  followers_count: string;
+  followers_count_numeric: number;
+  engagement_rate: number;
+  country: string;
+  niche: string;
+  language: string;
+  about?: string;
+  avg_views?: number;
+  collaboration_rate?: number;
+  rating?: number;
+  match_percentage?: number;
+  created_at: string;
+  updated_at: string;
+  // Additional UI properties for the influencer discovery
+  avatar?: string;
+  match_score?: number;
+  audience_match?: number;
+  content_quality?: number;
+  engagement_quality?: number;
+}
+
 // Type for the API response
 export interface CreatorResponse {
   total: number;
-  creators: Array<{
-    id: string;
-    name: string;
-    email: string;
-    platform: string;
-    channel_name?: string;
-    handle?: string;
-    profile_image?: string;
-    followers_count: string;
-    followers_count_numeric: number;
-    engagement_rate: number;
-    country: string;
-    niche: string;
-    language: string;
-    about?: string;
-    avg_views?: number;
-    collaboration_rate?: number;
-    rating?: number;
-    match_percentage?: number;
-    created_at: string;
-    updated_at: string;
-  }>;
+  creators: Creator[];
+  items: Creator[]; // Add items property that points to the same data as creators
   filters_applied: {
     niche?: string;
     platform?: string;
@@ -92,7 +103,23 @@ export const getCreators = async (params: CreatorSearchParams): Promise<CreatorR
     
     const data = await response.json();
     console.log('Creators fetched successfully:', data);
-    return data;
+    
+    // Transform the response to include both creators and items properties
+    // and add mock data for UI properties that might be missing
+    const transformedCreators = data.creators?.map((creator: any) => ({
+      ...creator,
+      avatar: creator.profile_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${creator.id}`,
+      match_score: creator.match_percentage || Math.floor(Math.random() * 30) + 70,
+      audience_match: Math.floor(Math.random() * 20) + 80,
+      content_quality: Math.floor(Math.random() * 15) + 85,
+      engagement_quality: Math.floor(Math.random() * 25) + 75,
+    })) || [];
+
+    return {
+      ...data,
+      creators: transformedCreators,
+      items: transformedCreators, // Make items point to the same transformed data
+    };
   } catch (error) {
     console.error('Error fetching creators:', error);
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
