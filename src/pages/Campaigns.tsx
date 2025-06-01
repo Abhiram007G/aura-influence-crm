@@ -23,6 +23,36 @@ interface CampaignResponse {
   updated_at: string;
 }
 
+// Outreach API Response type
+interface OutreachResponse {
+  id: string;
+  campaign_id: string;
+  creator_id: string;
+  channel: string;
+  message_type: string;
+  content: Record<string, any>;
+  status: string;
+  timestamp: string;
+  conversation_id: string | null;
+  twilio_call_sid: string | null;
+  call_duration_seconds: number | null;
+  call_successful: boolean | null;
+  transcript_summary: string | null;
+  full_transcript: string | null;
+  interest_assessment_result: string | null;
+  interest_assessment_rationale: string | null;
+  communication_quality_result: string | null;
+  communication_quality_rationale: string | null;
+  interest_level: string | null;
+  collaboration_rate: string | null;
+  preferred_content_types: string | null;
+  timeline_availability: string | null;
+  contact_preferences: string | null;
+  audience_demographics: string | null;
+  brand_restrictions: string | null;
+  follow_up_actions: string | null;
+}
+
 // UI Campaign type (transformed from API response)
 interface Campaign {
   id: string;
@@ -64,6 +94,20 @@ const Campaigns = () => {
     return params.toString();
   };
 
+  const fetchOutreachCount = async (campaignId: string): Promise<number> => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/outreach/campaign/${campaignId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch outreach data');
+      }
+      const data: OutreachResponse[] = await response.json();
+      return data.length;
+    } catch (err) {
+      console.error('Error fetching outreach count:', err);
+      return 0;
+    }
+  };
+
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
@@ -79,20 +123,23 @@ const Campaigns = () => {
         
         const data: CampaignResponse[] = await response.json();
         
-        // Transform API response to UI format
-        const transformedCampaigns: Campaign[] = data.map(campaign => ({
-          id: campaign.id,
-          name: campaign.product_name,
-          brand: campaign.brand_name,
-          status: campaign.status,
-          budget: campaign.total_budget,
-          influencersCount: campaign.influencer_count,
-          startDate: campaign.created_at,
-          performance: {
-            reach: 1050000, // These would come from analytics API
-            engagement: 1500000,
-            conversions: 10000
-          }
+        // Transform API response to UI format and fetch outreach counts
+        const transformedCampaigns: Campaign[] = await Promise.all(data.map(async campaign => {
+          const outreachCount = await fetchOutreachCount(campaign.id);
+          return {
+            id: campaign.id,
+            name: campaign.product_name,
+            brand: campaign.brand_name,
+            status: campaign.status,
+            budget: campaign.total_budget,
+            influencersCount: outreachCount, // Use outreach count instead of influencer_count
+            startDate: campaign.created_at,
+            performance: {
+              reach: 1050000, // These would come from analytics API
+              engagement: 1500000,
+              conversions: 10000
+            }
+          };
         }));
 
         setCampaigns(transformedCampaigns);

@@ -280,7 +280,7 @@ const CampaignDetails = () => {
                 className="w-full border-border hover:bg-secondary/20"
                 onClick={() => navigate(`/campaign/${id}/irm`)}
               >
-                View in IRM
+                View Influencers
               </Button>
             </CardContent>
           </Card>
