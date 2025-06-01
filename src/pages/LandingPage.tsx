@@ -224,7 +224,7 @@ const LandingPage = () => {
             Join thousands of brands using InfluencerFlow to scale their influencer campaigns
           </p>
           <Button 
-            onClick={() => navigate("/signup")} 
+            onClick={() => navigate("/dashboard")} 
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-lg px-8 py-6 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300"
           >
             Get Started Free
