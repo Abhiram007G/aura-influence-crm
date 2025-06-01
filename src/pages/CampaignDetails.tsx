@@ -278,7 +278,7 @@ const CampaignDetails = () => {
               <Button
                 variant="outline"
                 className="w-full border-border hover:bg-secondary/20"
-                onClick={() => navigate('/irm')}
+                onClick={() => navigate(`/campaign/${id}/irm`)}
               >
                 View in IRM
               </Button>

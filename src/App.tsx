@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import DiscoverInfluencer from "./pages/DiscoverInfluencer";
 import IRM from "./pages/IRM";
 import NotFound from "./pages/NotFound";
 import CampaignInfluencers from "./pages/CampaignInfluencers";
+import CampaignIRM from "./pages/CampaignIRM";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +35,7 @@ const App = () => (
                 <Route path="/campaigns/:id" element={<CampaignDetails />} />
                 <Route path="/campaigns/new" element={<CampaignNew />} />
                 <Route path="/campaigns/:id/influencers" element={<CampaignInfluencers />} />
+                <Route path="/campaign/:id/irm" element={<CampaignIRM />} />
                 <Route path="/discover" element={<DiscoverInfluencer />} />
                 <Route path="/irm" element={<IRM />} />
                 <Route path="*" element={<NotFound />} />

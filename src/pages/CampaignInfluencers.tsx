@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Users, Loader2, Heart, MessageCircle, Target, Users2, TrendingUp, DollarSign } from "lucide-react";
+import { ArrowLeft, Users, Loader2, Heart, MessageCircle, Target, Users2, TrendingUp, DollarSign, Check } from "lucide-react";
 import { CampaignSimilarityResponse } from "@/lib/services/campaignService";
 import { config } from "@/lib/config";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CampaignDetails {
   id: string;
@@ -61,6 +62,8 @@ const CampaignInfluencers = () => {
   const [error, setError] = useState<string | null>(null);
   const [similarInfluencers, setSimilarInfluencers] = useState<SimilarInfluencersResponse | null>(null);
   const [campaign, setCampaign] = useState<CampaignDetails | null>(null);
+  const [selectedInfluencers, setSelectedInfluencers] = useState<string[]>([]);
+  const [isOutreachLoading, setIsOutreachLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,6 +109,43 @@ const CampaignInfluencers = () => {
     if (numScore >= 60) return "text-blue-400";
     if (numScore >= 40) return "text-yellow-400";
     return "text-red-400";
+  };
+
+  const handleCheckboxChange = (influencerId: string) => {
+    setSelectedInfluencers(prev => 
+      prev.includes(influencerId)
+        ? prev.filter(id => id !== influencerId)
+        : [...prev, influencerId]
+    );
+  };
+
+  const handleOutreach = async () => {
+    if (!selectedInfluencers.length || !id) return;
+    
+    setIsOutreachLoading(true);
+    try {
+      // Make API calls for each selected influencer
+      const outreachPromises = selectedInfluencers.map(influencerId =>
+        fetch(`${config.apiBaseUrl}/api/v1/outreach/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campaign_id: id,
+            creator_id: influencerId
+          })
+        })
+      );
+
+      await Promise.all(outreachPromises);
+      navigate(`/campaign/${id}/irm`); // Navigate to campaign-specific IRM page
+    } catch (error) {
+      console.error('Error during outreach:', error);
+      setError('Failed to initiate outreach');
+    } finally {
+      setIsOutreachLoading(false);
+    }
   };
 
   if (loading) {
@@ -161,19 +201,54 @@ const CampaignInfluencers = () => {
 
       <Card className="premium-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Matching Influencers
-          </CardTitle>
-          <CardDescription>
-            These influencers have been selected based on their relevance to your campaign
-          </CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Matching Influencers
+              </CardTitle>
+              <CardDescription>
+                These influencers have been selected based on their relevance to your campaign
+              </CardDescription>
+            </div>
+            {selectedInfluencers.length > 0 && (
+              <Button 
+                onClick={handleOutreach}
+                disabled={isOutreachLoading}
+                className="premium-button"
+              >
+                {isOutreachLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Initiating Outreach...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Outreach ({selectedInfluencers.length})
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-slate-700/50">
+                  <TableHead className="w-[50px]">
+                    <Checkbox
+                      checked={selectedInfluencers.length === similarInfluencers?.matches.length}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedInfluencers(similarInfluencers?.matches.map(m => m.id) || []);
+                        } else {
+                          setSelectedInfluencers([]);
+                        }
+                      }}
+                    />
+                  </TableHead>
                   <TableHead>Influencer</TableHead>
                   <TableHead>Match Score</TableHead>
                   <TableHead>Niche</TableHead>
@@ -190,6 +265,12 @@ const CampaignInfluencers = () => {
                     key={influencer.id}
                     className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
                   >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedInfluencers.includes(influencer.id)}
+                        onCheckedChange={() => handleCheckboxChange(influencer.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium text-foreground">{influencer.influencer_name}</div>
