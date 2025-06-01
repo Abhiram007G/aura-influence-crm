@@ -42,7 +42,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-xl shadow-xl shadow-black/20">
-      <SidebarHeader className="p-6 border-b border-slate-700/30">
+      <SidebarHeader className="p-6 border-b border-slate-700/30" onClick={() => navigate("/")}>
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30">
             <Calendar className="w-4 h-4 text-white" />

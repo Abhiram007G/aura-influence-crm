@@ -22,40 +22,39 @@ import LandingPage from "./pages/LandingPage";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const isAuthenticated = false; // Replace with actual auth logic
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {isAuthenticated ? (
-            <SidebarProvider>
-              <div className="min-h-screen flex w-full bg-background">
-                <AppSidebar />
-                <MainLayout>
-                  <Routes>
-                    <Route path="/\" element={<Dashboard />} />
-                    <Route path="/campaigns" element={<Campaigns />} />
-                    <Route path="/campaigns/:id" element={<CampaignDetails />} />
-                    <Route path="/campaigns/new" element={<CampaignNew />} />
-                    <Route path="/campaigns/:id/influencers" element={<CampaignInfluencers />} />
-                    <Route path="/campaign/:id/irm" element={<CampaignIRM />} />
-                    <Route path="/conversation/:id" element={<ConversationDetails />} />
-                    <Route path="/discover" element={<DiscoverInfluencer />} />
-                    <Route path="/irm" element={<IRM />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </MainLayout>
-              </div>
-            </SidebarProvider>
-          ) : (
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="*" element={<LandingPage />} />
-            </Routes>
-          )}
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route
+              path="/*"
+              element={
+                <SidebarProvider>
+                  <div className="min-h-screen flex w-full bg-background">
+                    <AppSidebar />
+                    <MainLayout>
+                      <Routes>
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="campaigns" element={<Campaigns />} />
+                        <Route path="campaigns/:id" element={<CampaignDetails />} />
+                        <Route path="campaigns/new" element={<CampaignNew />} />
+                        <Route path="campaigns/:id/influencers" element={<CampaignInfluencers />} />
+                        <Route path="campaign/:id/irm" element={<CampaignIRM />} />
+                        <Route path="conversation/:id" element={<ConversationDetails />} />
+                        <Route path="discover" element={<DiscoverInfluencer />} />
+                        <Route path="irm" element={<IRM />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </MainLayout>
+                  </div>
+                </SidebarProvider>
+              }
+            />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
