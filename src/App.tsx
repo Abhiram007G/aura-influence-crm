@@ -15,6 +15,7 @@ import InfluencerDiscovery from "./pages/InfluencerDiscovery";
 import DiscoverInfluencer from "./pages/DiscoverInfluencer";
 import IRM from "./pages/IRM";
 import NotFound from "./pages/NotFound";
+import CampaignInfluencers from "./pages/CampaignInfluencers";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +34,7 @@ const App = () => (
                 <Route path="/campaigns" element={<Campaigns />} />
                 <Route path="/campaigns/:id" element={<CampaignDetails />} />
                 <Route path="/campaigns/new" element={<CampaignNew />} />
-                <Route path="/campaigns/:id/influencers" element={<InfluencerDiscovery />} />
+                <Route path="/campaigns/:id/influencers" element={<CampaignInfluencers />} />
                 <Route path="/discover" element={<DiscoverInfluencer />} />
                 <Route path="/irm" element={<IRM />} />
                 <Route path="*" element={<NotFound />} />

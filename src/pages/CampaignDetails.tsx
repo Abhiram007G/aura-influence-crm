@@ -1,11 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, DollarSign, Target, Users, Briefcase, FileText } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Target, Users, Briefcase, FileText, Loader2 } from "lucide-react";
 import { config } from "@/lib/config";
+import { findSimilarInfluencers, CampaignSimilarityResponse } from "@/lib/services/campaignService";
+import { useToast } from "@/hooks/use-toast";
 
 interface CampaignDetails {
   id: string;
@@ -27,9 +28,11 @@ interface CampaignDetails {
 const CampaignDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [campaign, setCampaign] = useState<CampaignDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [findingInfluencers, setFindingInfluencers] = useState(false);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -64,6 +67,30 @@ const CampaignDetails = () => {
       case "completed": return "bg-blue-500/20 text-blue-400";
       case "paused": return "bg-red-500/20 text-red-400";
       default: return "bg-gray-500/20 text-gray-400";
+    }
+  };
+
+  const handleFindInfluencers = async () => {
+    if (!id) return;
+    
+    try {
+      setFindingInfluencers(true);
+      const response = await findSimilarInfluencers(id);
+      
+      // Store the results in localStorage to pass to the influencers page
+      localStorage.setItem('similarInfluencers', JSON.stringify(response));
+      
+      // Navigate to the influencers page
+      navigate(`/campaigns/${id}/influencers`);
+    } catch (error) {
+      console.error('Error finding similar influencers:', error);
+      toast({
+        title: "Error",
+        description: "Failed to find similar influencers. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setFindingInfluencers(false);
     }
   };
 
@@ -232,9 +259,20 @@ const CampaignDetails = () => {
             <CardContent className="space-y-3">
               <Button
                 className="w-full bg-gradient-purple hover:opacity-90 text-white"
-                onClick={() => navigate(`/campaigns/${campaign.id}/influencers`)}
+                onClick={handleFindInfluencers}
+                disabled={findingInfluencers}
               >
-                Find Influencers
+                {findingInfluencers ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Finding Influencers...
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 mr-2" />
+                    Find Influencers
+                  </>
+                )}
               </Button>
               
               <Button

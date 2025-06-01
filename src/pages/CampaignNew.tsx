@@ -56,8 +56,8 @@ const CampaignNew = () => {
         description: "Your campaign has been created successfully.",
       });
 
-      // Navigate to influencer discovery page
-      navigate(`/campaigns/${response.id}/influencers`);
+      // Navigate to campaign details page
+      navigate(`/campaigns/${response.id}`);
     } catch (error) {
       console.error('Error creating campaign:', error);
       toast({
@@ -227,7 +227,7 @@ const CampaignNew = () => {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5 mr-2" />
-                    Find Matching Influencers
+                    Create Campaign
                   </>
                 )}
               </Button>

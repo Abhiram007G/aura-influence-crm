@@ -28,6 +28,27 @@ export interface CampaignResponse {
   updated_at: string;
 }
 
+// Interface for campaign similarity response
+export interface CampaignSimilarityResponse {
+  matches: {
+    id: string;
+    influencer_name: string;
+    match_score: string;
+    niche: string;
+    followers: string;
+    engagement: string;
+    collaboration_rate: string;
+    detailed_scores: {
+      niche_match: string;
+      audience_match: string;
+      engagement_score: string;
+      budget_fit: string;
+    };
+  }[];
+  total_matches: number;
+  search_parameters: Record<string, any>;
+}
+
 // Common headers for all requests
 const defaultHeaders = {
   'Content-Type': 'application/json',
@@ -50,7 +71,7 @@ export const createCampaign = async (campaignData: CampaignCreate): Promise<Camp
       method: 'POST',
       headers: defaultHeaders,
       body: JSON.stringify(campaignData),
-      credentials: 'include', // Include cookies if needed
+      
     });
     
     if (!response.ok) {
@@ -99,7 +120,7 @@ export const getCampaigns = async (params?: {
   try {
     const response = await fetch(apiUrl, {
       headers: defaultHeaders,
-      credentials: 'include',
+      
     });
     
     if (!response.ok) {
@@ -133,7 +154,7 @@ export const getCampaignById = async (campaignId: string): Promise<CampaignRespo
   try {
     const response = await fetch(apiUrl, {
       headers: defaultHeaders,
-      credentials: 'include',
+      
     });
     
     if (!response.ok) {
@@ -147,6 +168,54 @@ export const getCampaignById = async (campaignId: string): Promise<CampaignRespo
     return data;
   } catch (error) {
     console.error('Error fetching campaign:', error);
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error(
+        `Unable to connect to the server at ${apiUrl}. Please check if the server is running and accessible.`
+      );
+    }
+    throw error;
+  }
+};
+
+/**
+ * Find similar influencers for a campaign
+ * @param campaignId - The ID of the campaign to find similar influencers for
+ * @param matchThreshold - The minimum match score threshold (0-1)
+ * @param matchCount - The number of matches to return
+ * @returns Promise containing the similar influencers
+ */
+export const findSimilarInfluencers = async (
+  campaignId: string,
+  matchThreshold: number = 0.5,
+  matchCount: number = 10
+): Promise<CampaignSimilarityResponse> => {
+  const apiUrl = `${config.apiBaseUrl}/api/v1/ai/campaign-similarity`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        ...defaultHeaders,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        campaign_id: campaignId,
+        match_threshold: matchThreshold,
+        match_count: matchCount,
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorData?.message || response.statusText}`
+      );
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error finding similar influencers:', error);
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
       throw new Error(
         `Unable to connect to the server at ${apiUrl}. Please check if the server is running and accessible.`
