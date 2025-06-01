@@ -305,7 +305,7 @@ const Campaigns = () => {
                       variant="outline"
                       size="sm"
                       className="flex-1 border-border hover:bg-secondary/20"
-                      onClick={() => navigate(`/campaigns/${campaign.id}/influencers`)}
+                      onClick={() => navigate(`/campaigns/${campaign.id}`)}
                     >
                       View Details
                     </Button>

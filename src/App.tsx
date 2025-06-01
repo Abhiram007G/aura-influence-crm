@@ -10,6 +10,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
 import CampaignNew from "./pages/CampaignNew";
+import CampaignDetails from "./pages/CampaignDetails";
 import InfluencerDiscovery from "./pages/InfluencerDiscovery";
 import DiscoverInfluencer from "./pages/DiscoverInfluencer";
 import IRM from "./pages/IRM";
