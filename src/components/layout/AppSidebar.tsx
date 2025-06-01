@@ -36,10 +36,10 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar className="border-r border-sidebar-border">
-      <SidebarHeader className="p-6">
+    <Sidebar className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-xl shadow-xl shadow-black/20">
+      <SidebarHeader className="p-6 border-b border-slate-700/30">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-purple rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30">
             <Calendar className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -50,7 +50,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-2">
             Platform
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -60,7 +60,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="hover:bg-sidebar-accent data-[active=true]:bg-gradient-purple data-[active=true]:text-white"
+                    className="hover:bg-slate-800/60 data-[active=true]:bg-gradient-to-r data-[active=true]:from-blue-600/80 data-[active=true]:to-purple-600/80 data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:shadow-purple-500/20 transition-all duration-200"
                   >
                     <button
                       onClick={() => navigate(item.url)}
