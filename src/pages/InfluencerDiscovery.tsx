@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,65 +6,26 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Users } from "lucide-react";
-
-// Mock data for influencers
-const mockInfluencers = [
-  {
-    id: "inf_1",
-    name: "Sarah Johnson",
-    handle: "@sarahjohnson",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=100&h=100&fit=crop&crop=face",
-    matchScore: 92,
-    niche: "Lifestyle",
-    followers: "374K",
-    engagementRate: "4.2%",
-    collaborationRate: "$2.5K",
-    detailedScores: {
-      audienceMatch: 95,
-      contentQuality: 88,
-      engagementQuality: 94
-    }
-  },
-  {
-    id: "inf_2",
-    name: "Mike Chen",
-    handle: "@mikechen",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    matchScore: 88,
-    niche: "Tech",
-    followers: "156K",
-    engagementRate: "6.1%",
-    collaborationRate: "$1.8K",
-    detailedScores: {
-      audienceMatch: 90,
-      contentQuality: 85,
-      engagementQuality: 89
-    }
-  },
-  {
-    id: "inf_3",
-    name: "Emma Rodriguez",
-    handle: "@emmarodriguez",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-    matchScore: 85,
-    niche: "Fashion",
-    followers: "289K",
-    engagementRate: "3.8%",
-    collaborationRate: "$3.2K",
-    detailedScores: {
-      audienceMatch: 82,
-      contentQuality: 92,
-      engagementQuality: 81
-    }
-  }
-];
+import { Search, Filter, Users, Loader2 } from "lucide-react";
+import { useCreators } from "@/hooks/useCreators";
+import { CreatorSearchParams } from "@/lib/services/creatorService";
 
 const InfluencerDiscovery = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedInfluencers, setSelectedInfluencers] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams, setSearchParams] = useState<CreatorSearchParams>({
+    search: "",
+    limit: 20,
+    offset: 0
+  });
+
+  const { creators, loading, error, fetchCreators } = useCreators();
+
+  // Fetch creators when search params change
+  useEffect(() => {
+    fetchCreators(searchParams);
+  }, [searchParams, fetchCreators]);
 
   const handleSelectInfluencer = (influencerId: string) => {
     setSelectedInfluencers(prev => 
@@ -76,10 +36,12 @@ const InfluencerDiscovery = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedInfluencers.length === mockInfluencers.length) {
+    if (!creators?.items) return;
+    
+    if (selectedInfluencers.length === creators.items.length) {
       setSelectedInfluencers([]);
     } else {
-      setSelectedInfluencers(mockInfluencers.map(inf => inf.id));
+      setSelectedInfluencers(creators.items.map(inf => inf.id));
     }
   };
 
@@ -87,6 +49,14 @@ const InfluencerDiscovery = () => {
     // TODO: API call to add selected influencers to IRM
     console.log("Adding to IRM:", selectedInfluencers);
     navigate("/irm");
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchParams(prev => ({
+      ...prev,
+      search: value,
+      offset: 0 // Reset offset when searching
+    }));
   };
 
   const getMatchScoreColor = (score: number) => {
@@ -112,8 +82,8 @@ const InfluencerDiscovery = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search influencers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchParams.search || ""}
+                  onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10 premium-input"
                 />
               </div>
@@ -134,7 +104,16 @@ const InfluencerDiscovery = () => {
             AI-Matched Influencers
           </CardTitle>
           <CardDescription>
-            Found {mockInfluencers.length} influencers matching your campaign criteria
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading influencers...
+              </div>
+            ) : error ? (
+              <div className="text-red-500">Error loading influencers: {error.message}</div>
+            ) : (
+              `Found ${creators?.items?.length || 0} influencers matching your criteria`
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -160,7 +139,7 @@ const InfluencerDiscovery = () => {
                 <TableRow className="border-slate-700/50">
                   <TableHead className="w-12">
                     <Checkbox
-                      checked={selectedInfluencers.length === mockInfluencers.length}
+                      checked={creators?.items && selectedInfluencers.length === creators.items.length}
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
@@ -175,7 +154,22 @@ const InfluencerDiscovery = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockInfluencers.map((influencer) => (
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>Loading influencers...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : error ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8 text-red-500">
+                      Error loading influencers: {error.message}
+                    </TableCell>
+                  </TableRow>
+                ) : creators?.items?.map((influencer) => (
                   <TableRow 
                     key={influencer.id} 
                     className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
@@ -200,8 +194,8 @@ const InfluencerDiscovery = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={`${getMatchScoreColor(influencer.matchScore)} text-white shadow-lg`}>
-                        {influencer.matchScore}%
+                      <Badge className={`${getMatchScoreColor(influencer.match_score)} text-white shadow-lg`}>
+                        {influencer.match_score}%
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -209,14 +203,14 @@ const InfluencerDiscovery = () => {
                         {influencer.niche}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">{influencer.followers}</TableCell>
-                    <TableCell className="font-medium">{influencer.engagementRate}</TableCell>
-                    <TableCell className="font-medium">{influencer.collaborationRate}</TableCell>
+                    <TableCell className="font-medium">{influencer.followers_count}</TableCell>
+                    <TableCell className="font-medium">{influencer.engagement_rate}%</TableCell>
+                    <TableCell className="font-medium">${influencer.collaboration_rate}</TableCell>
                     <TableCell>
                       <div className="text-xs space-y-1">
-                        <div>Audience: {influencer.detailedScores.audienceMatch}%</div>
-                        <div>Content: {influencer.detailedScores.contentQuality}%</div>
-                        <div>Engagement: {influencer.detailedScores.engagementQuality}%</div>
+                        <div>Audience: {influencer.audience_match}%</div>
+                        <div>Content: {influencer.content_quality}%</div>
+                        <div>Engagement: {influencer.engagement_quality}%</div>
                       </div>
                     </TableCell>
                   </TableRow>

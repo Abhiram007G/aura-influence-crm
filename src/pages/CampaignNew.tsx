@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Megaphone, Sparkles } from "lucide-react";
+import { createCampaign, CampaignCreate } from "@/lib/services/campaignService";
+import { useToast } from "@/hooks/use-toast";
 
 const CampaignNew = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     productName: "",
     brandName: "",
@@ -30,13 +33,41 @@ const CampaignNew = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // TODO: API call to create campaign
-    console.log("Creating campaign:", formData);
-    
-    // Mock campaign ID for navigation
-    const campaignId = "camp_" + Date.now();
-    navigate(`/campaigns/${campaignId}/influencers`);
+    try {
+      // Convert form data to API format
+      const campaignData: CampaignCreate = {
+        product_name: formData.productName,
+        brand_name: formData.brandName,
+        product_description: formData.productDescription || undefined,
+        target_audience: formData.targetAudience || undefined,
+        key_use_cases: formData.keyUseCases || undefined,
+        campaign_goal: formData.campaignGoal || undefined,
+        product_niche: formData.productNiche || undefined,
+        total_budget: parseFloat(formData.totalBudget)
+      };
+
+      // Create campaign
+      const response = await createCampaign(campaignData);
+      
+      toast({
+        title: "Campaign Created",
+        description: "Your campaign has been created successfully.",
+      });
+
+      // Navigate to influencer discovery page
+      navigate(`/campaigns/${response.id}/influencers`);
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create campaign. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = formData.productName && formData.brandName && formData.totalBudget;
@@ -184,12 +215,21 @@ const CampaignNew = () => {
             <div className="flex justify-center pt-6">
               <Button
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isFormValid || isSubmitting}
                 className="premium-button px-8 py-3 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 size="lg"
               >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Find Matching Influencers
+                {isSubmitting ? (
+                  <>
+                    <Sparkles className="w-5 h-5 mr-2 animate-spin" />
+                    Creating Campaign...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Find Matching Influencers
+                  </>
+                )}
               </Button>
             </div>
           </form>
