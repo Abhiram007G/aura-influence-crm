@@ -137,7 +137,7 @@ const CampaignIRM = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<OutreachData | null>(null);
-  const [isCallLoading, setIsCallLoading] = useState(false);
+  const [callLoadingId, setCallLoadingId] = useState<string | null>(null);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [callAnalysis, setCallAnalysis] = useState<CallAnalysis | null>(null);
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
@@ -155,11 +155,11 @@ const CampaignIRM = () => {
         setOutreachData(outreachData);
 
         // Fetch product details
-        const productResponse = await fetch(`${config.apiBaseUrl}/api/v1/products/${id}`);
-        if (productResponse.ok) {
-          const productData = await productResponse.json();
-          setProductDetails(productData);
-        }
+        // const productResponse = await fetch(`${config.apiBaseUrl}/api/v1/campaigns/${id}`);
+        // if (productResponse.ok) {
+        //   const productData = await productResponse.json();
+        //   setProductDetails(productData);
+        // }
 
         // Fetch brand details
         const brandResponse = await fetch(`${config.apiBaseUrl}/api/v1/brands/${id}`);
@@ -215,7 +215,7 @@ const CampaignIRM = () => {
   };
 
   const handleCall = async (entry: OutreachData) => {
-    setIsCallLoading(true);
+    setCallLoadingId(entry.id);
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/v1/outreach/call/initiate`, {
         method: 'POST',
@@ -254,7 +254,7 @@ const CampaignIRM = () => {
         variant: "destructive",
       });
     } finally {
-      setIsCallLoading(false);
+      setCallLoadingId(null);
     }
   };
 
@@ -463,7 +463,7 @@ const CampaignIRM = () => {
               <div
                 key={entry.id}
                 onClick={() => navigate(`/conversation/${entry.id}`)}
-                className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
+                className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer group"
               >
                 {creator?.profile_image ? (
                   <img
@@ -480,7 +480,25 @@ const CampaignIRM = () => {
                   <h4 className="font-medium">{creator?.name}</h4>
                   <p className="text-sm text-muted-foreground">{creator?.niche}</p>
                 </div>
-                <div className="ml-auto text-right">
+                <div className="ml-auto text-right flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCall(entry);
+                      }}
+                      disabled={callLoadingId === entry.id}
+                      className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
+                    >
+                      {callLoadingId === entry.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Phone className="w-3 h-3" />
+                      )}
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground">{entry.status}</p>
                   <p className="text-xs text-muted-foreground">{new Date(entry.timestamp).toLocaleDateString()}</p>
                 </div>
