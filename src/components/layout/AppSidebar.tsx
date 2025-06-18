@@ -41,21 +41,21 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-xl shadow-xl shadow-black/20">
-      <SidebarHeader className="p-6 border-b border-slate-700/30" onClick={() => navigate("/")}>
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30">
-            <Calendar className="w-4 h-4 text-white" />
+    <Sidebar className="border-r border-white/20 bg-white/95 backdrop-blur-xl shadow-card">
+      <SidebarHeader className="p-6 border-b border-white/20" onClick={() => navigate("/")}>
+        <div className="flex items-center gap-3 cursor-pointer">
+          <div className="w-10 h-10 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
+            <Calendar className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold gradient-text">InfluencerFlow</h1>
-            <p className="text-xs text-muted-foreground">AI Platform</p>
+            <h1 className="text-xl font-baloo font-bold text-text-primary">InfluencerFlow</h1>
+            <p className="text-sm text-text-secondary font-andika">AI Platform</p>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-2">
+          <SidebarGroupLabel className="text-xs font-glegoo font-medium text-text-secondary uppercase tracking-wider px-3 py-2">
             Platform
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -65,14 +65,14 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="hover:bg-slate-800/60 data-[active=true]:bg-gradient-to-r data-[active=true]:from-blue-600/80 data-[active=true]:to-purple-600/80 data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:shadow-purple-500/20 transition-all duration-200"
+                    className="hover:bg-secondary/30 data-[active=true]:bg-gradient-primary data-[active=true]:text-white data-[active=true]:shadow-glow transition-all duration-200 rounded-xl"
                   >
                     <button
                       onClick={() => navigate(item.url)}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+                      className="w-full flex items-center gap-3 p-4 rounded-xl transition-all duration-200 font-andika font-medium"
                     >
-                      <item.icon className="w-4 h-4" />
-                      <span className="font-medium">{item.title}</span>
+                      <item.icon className="w-5 h-5" />
+                      <span>{item.title}</span>
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
