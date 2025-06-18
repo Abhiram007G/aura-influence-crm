@@ -41,7 +41,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-primary text-text-primary font-andika;
+    @apply bg-gradient-to-br from-white to-secondary/5 text-text-primary font-andika;
     font-feature-settings: "rlig" 1, "calt" 1;
     min-height: 100vh;
   }
@@ -80,12 +80,25 @@
     background: linear-gradient(135deg, #9760f1, #693be3);
   }
 
+  .bg-gradient-purple {
+    background: linear-gradient(135deg, #9760f1, #693be3);
+  }
+
   .bg-card-gradient {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
     backdrop-filter: blur(10px);
   }
 
+  .glass-card {
+    @apply bg-white/95 backdrop-blur-sm border border-white/20 shadow-card;
+  }
+
   .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #9760f1, #693be3);
+  }
+
+  .gradient-text {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, #9760f1, #693be3);
   }
@@ -96,6 +109,12 @@
   }
 
   .hover-card-glow:hover {
+    box-shadow: 0 8px 32px rgba(151, 96, 241, 0.2),
+                0 0 0 1px rgba(177, 156, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .hover-glow:hover {
     box-shadow: 0 8px 32px rgba(151, 96, 241, 0.2),
                 0 0 0 1px rgba(177, 156, 255, 0.3);
     transform: translateY(-2px);
@@ -117,59 +136,69 @@
     @apply bg-white rounded-3xl p-8 shadow-card hover-card-glow backdrop-blur-sm;
   }
 
-  /* Status Colors */
+  /* Status Colors - Enhanced for better visibility */
   .status-active {
-    @apply bg-green-100 text-green-800 border-green-200;
+    @apply bg-green-100 text-green-800 border-green-200 font-medium;
   }
 
   .status-pending {
-    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200 font-medium;
   }
 
   .status-completed {
-    @apply bg-blue-100 text-blue-800 border-blue-200;
+    @apply bg-blue-100 text-blue-800 border-blue-200 font-medium;
   }
 
   .status-cancelled {
-    @apply bg-red-100 text-red-800 border-red-200;
+    @apply bg-red-100 text-red-800 border-red-200 font-medium;
   }
 
   .status-draft {
-    @apply bg-gray-100 text-gray-800 border-gray-200;
+    @apply bg-gray-100 text-gray-800 border-gray-200 font-medium;
   }
 
   .status-initialized {
-    @apply bg-purple-100 text-purple-800 border-purple-200;
+    @apply bg-purple-100 text-purple-800 border-purple-200 font-medium;
   }
 
   .status-call-initiated {
-    @apply bg-orange-100 text-orange-800 border-orange-200;
+    @apply bg-orange-100 text-orange-800 border-orange-200 font-medium;
   }
 
   /* Engagement Rate Colors */
   .engagement-high {
-    @apply bg-green-500 text-white;
+    @apply bg-green-500 text-white font-medium;
   }
 
   .engagement-medium {
-    @apply bg-blue-500 text-white;
+    @apply bg-blue-500 text-white font-medium;
   }
 
   .engagement-low {
-    @apply bg-orange-500 text-white;
+    @apply bg-orange-500 text-white font-medium;
   }
 
-  /* Text Utilities */
+  /* Enhanced Text Utilities for better visibility */
   .text-visible {
-    @apply text-text-primary font-medium;
+    @apply text-slate-800 font-medium;
   }
 
   .text-secondary-visible {
-    @apply text-text-secondary font-normal;
+    @apply text-slate-600 font-normal;
   }
 
   .text-muted-visible {
-    @apply text-gray-600 font-normal;
+    @apply text-slate-500 font-normal;
+  }
+
+  /* Override muted foreground for better contrast */
+  .text-muted-foreground {
+    @apply text-slate-500;
+  }
+
+  /* Override foreground for better contrast */
+  .text-foreground {
+    @apply text-slate-800;
   }
 
   .thinking-dots::after {
@@ -195,7 +224,7 @@
   }
 
   .processing-state {
-    @apply text-text-secondary italic font-andika;
+    @apply text-slate-600 italic font-andika;
   }
 
   .agent-message {
