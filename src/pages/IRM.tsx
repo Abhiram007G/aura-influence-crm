@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Users, Phone, Mail, MessageSquare, Calendar } from "lucide-react";
 import { getOutreachEntries, initiateCall, sendEmail, OutreachResponse } from "@/lib/services/outreachService";
 import { useNavigate } from "react-router-dom";
+import SectionCard from "@/components/ui/SectionCard";
 
 interface IRMEntry {
   id: string;
@@ -204,83 +205,31 @@ const IRM = () => {
         </div>
       </div>
 
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="gradient-text flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Active Outreach
-          </CardTitle>
-          <CardDescription>
-            {filteredEntries.length} influencers in your pipeline
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {filteredEntries.map((entry) => (
-              <div
-                key={entry.id}
-                onClick={() => navigate(`/conversation/${entry.id}`)}
-                className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
-              >
-                <img
-                  src={entry.influencer.profileImage}
-                  alt={entry.influencer.name}
-                  className="w-12 h-12 rounded-full"
-                />
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <p className="font-medium text-foreground">{entry.influencer.name}</p>
-                      <p className="text-sm text-muted-foreground">{entry.influencer.handle}</p>
-                    </div>
-                    <Badge className={getStatusColor(entry.status)}>
-                      {entry.status}
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{entry.campaign.name}</p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        Last contact: {new Date(entry.lastContact).toLocaleDateString()}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCall(entry);
-                        }}
-                        disabled={isCallLoading}
-                        className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                      >
-                        <Phone className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEmail(entry);
-                        }}
-                        disabled={isEmailLoading}
-                        className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                      >
-                        <Mail className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+      <SectionCard title="Active Outreach">
+        <div className="space-y-3">
+          {filteredEntries.map((entry) => (
+            <div
+              key={entry.id}
+              onClick={() => navigate(`/conversation/${entry.id}`)}
+              className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
+            >
+              <img
+                src={entry.influencer.profileImage}
+                alt={entry.influencer.name}
+                className="w-12 h-12 rounded-full"
+              />
+              <div>
+                <h4 className="font-medium">{entry.influencer.name}</h4>
+                <p className="text-sm text-muted-foreground">{entry.influencer.handle}</p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div className="ml-auto text-right">
+                <p className="text-xs text-muted-foreground">{entry.status}</p>
+                <p className="text-xs text-muted-foreground">{entry.lastContact}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
     </div>
   );
 };

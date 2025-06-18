@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { config } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SectionCard from "@/components/ui/SectionCard";
 
 interface CreatorDetails {
   id: string;
@@ -399,83 +400,75 @@ const ConversationDetails = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Creator Profile Card */}
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="gradient-text flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Creator Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                {creatorDetails.profile_image ? (
-                  <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${creatorDetails.name}`}
-                    alt={creatorDetails.name}
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-purple flex items-center justify-center text-white">
-                    <Users className="w-10 h-10" />
-                  </div>
-                )}
-                <div>
-                  <h3 className="text-xl font-semibold">{creatorDetails.name}</h3>
-                  <p className="text-muted-foreground">{creatorDetails.channel_name}</p>
-                  <Badge className="mt-2">{creatorDetails.platform}</Badge>
+        <SectionCard title="Creator Profile">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              {creatorDetails.profile_image ? (
+                <img
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${creatorDetails.name}`}
+                  alt={creatorDetails.name}
+                  className="w-20 h-20 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gradient-purple flex items-center justify-center text-white">
+                  <Users className="w-10 h-10" />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Followers</span>
-                  </div>
-                  <p className="font-medium">{creatorDetails.followers_count}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Star className="w-4 h-4" />
-                    <span>Engagement Rate</span>
-                  </div>
-                  <p className="font-medium">{creatorDetails.engagement_rate}%</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <span>Avg. Views</span>
-                  </div>
-                  <p className="font-medium">{creatorDetails.avg_views.toLocaleString()}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <User className="w-4 h-4" />
-                    <span>Niche</span>
-                  </div>
-                  <p className="font-medium">{creatorDetails.niche}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MailIcon className="w-4 h-4" />
-                  <span>Contact</span>
-                </div>
-                <p className="font-medium">{creatorDetails.email}</p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <PhoneIcon className="w-4 h-4" />
-                  <span>Location</span>
-                </div>
-                <p className="font-medium">{creatorDetails.country}</p>
+              )}
+              <div>
+                <h3 className="text-xl font-semibold">{creatorDetails.name}</h3>
+                <p className="text-muted-foreground">{creatorDetails.channel_name}</p>
+                <Badge className="mt-2">{creatorDetails.platform}</Badge>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Followers</span>
+                </div>
+                <p className="font-medium">{creatorDetails.followers_count}</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Star className="w-4 h-4" />
+                  <span>Engagement Rate</span>
+                </div>
+                <p className="font-medium">{creatorDetails.engagement_rate}%</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  <span>Avg. Views</span>
+                </div>
+                <p className="font-medium">{creatorDetails.avg_views.toLocaleString()}</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>Niche</span>
+                </div>
+                <p className="font-medium">{creatorDetails.niche}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <MailIcon className="w-4 h-4" />
+                <span>Contact</span>
+              </div>
+              <p className="font-medium">{creatorDetails.email}</p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <PhoneIcon className="w-4 h-4" />
+                <span>Location</span>
+              </div>
+              <p className="font-medium">{creatorDetails.country}</p>
+            </div>
+          </div>
+        </SectionCard>
 
         {/* Main Content */}
         <div className="lg:col-span-2">
@@ -488,10 +481,7 @@ const ConversationDetails = () => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="gradient-text">Conversation Status</CardTitle>
-                </CardHeader>
+              <SectionCard title="Conversation Status">
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -514,13 +504,10 @@ const ConversationDetails = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </SectionCard>
 
               {callAnalysis && (
-                <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="gradient-text">Call Summary</CardTitle>
-                  </CardHeader>
+                <SectionCard title="Call Summary">
                   <CardContent>
                     <div className="space-y-4">
                       <p className="text-sm">{callAnalysis.summary}</p>
@@ -536,16 +523,13 @@ const ConversationDetails = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
+                </SectionCard>
               )}
             </TabsContent>
 
             <TabsContent value="call-analysis" className="space-y-4">
               {callAnalysis ? (
-                <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="gradient-text">Call Analysis</CardTitle>
-                  </CardHeader>
+                <SectionCard title="Call Analysis">
                   <CardContent>
                     <div className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
@@ -603,22 +587,19 @@ const ConversationDetails = () => {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
+                </SectionCard>
               ) : (
-                <Card className="glass-card">
+                <SectionCard>
                   <CardContent className="py-8">
                     <p className="text-center text-muted-foreground">No call analysis available</p>
                   </CardContent>
-                </Card>
+                </SectionCard>
               )}
             </TabsContent>
 
             <TabsContent value="transcript" className="space-y-4">
               {callAnalysis ? (
-                <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="gradient-text">Call Transcript</CardTitle>
-                  </CardHeader>
+                <SectionCard title="Call Transcript">
                   <CardContent>
                     <div className="space-y-4 max-h-[600px] overflow-y-auto">
                       {callAnalysis.transcript.map((message, index) => (
@@ -642,21 +623,18 @@ const ConversationDetails = () => {
                       ))}
                     </div>
                   </CardContent>
-                </Card>
+                </SectionCard>
               ) : (
-                <Card className="glass-card">
+                <SectionCard>
                   <CardContent className="py-8">
                     <p className="text-center text-muted-foreground">No transcript available</p>
                   </CardContent>
-                </Card>
+                </SectionCard>
               )}
             </TabsContent>
 
             <TabsContent value="recording" className="space-y-4">
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="gradient-text">Call Recording</CardTitle>
-                </CardHeader>
+              <SectionCard title="Call Recording">
                 <CardContent>
                   {!outreachData?.conversation_id ? (
                     <p className="text-center text-muted-foreground">No call recording available</p>
@@ -752,7 +730,7 @@ const ConversationDetails = () => {
                     </div>
                   )}
                 </CardContent>
-              </Card>
+              </SectionCard>
             </TabsContent>
           </Tabs>
         </div>

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Users, Phone, Mail, MessageSquare, Calendar, Loader2 } from "lucide-react";
 import { config } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
+import SectionCard from "@/components/ui/SectionCard";
 
 interface CreatorDetails {
   id: string;
@@ -378,186 +379,116 @@ const CampaignIRM = () => {
       {/* Product and Brand Details Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {productDetails && (
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="gradient-text flex items-center gap-2">
-                Product Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+          <SectionCard title="Product Details">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg">{productDetails.name}</h3>
+                <p className="text-muted-foreground">{productDetails.description}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold text-lg">{productDetails.name}</h3>
-                  <p className="text-muted-foreground">{productDetails.description}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Category</p>
-                    <p className="font-medium">{productDetails.category}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Price Range</p>
-                    <p className="font-medium">{productDetails.price_range}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Target Audience</p>
-                    <p className="font-medium">{productDetails.target_audience}</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">Category</p>
+                  <p className="font-medium">{productDetails.category}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Key Features</p>
-                  <div className="flex flex-wrap gap-2">
-                    {productDetails.key_features.map((feature, index) => (
-                      <Badge key={index} variant="secondary">{feature}</Badge>
-                    ))}
-                  </div>
+                  <p className="text-sm text-muted-foreground">Price Range</p>
+                  <p className="font-medium">{productDetails.price_range}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Target Audience</p>
+                  <p className="font-medium">{productDetails.target_audience}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Key Features</p>
+                <div className="flex flex-wrap gap-2">
+                  {productDetails.key_features.map((feature, index) => (
+                    <Badge key={index} variant="secondary">{feature}</Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </SectionCard>
         )}
 
         {brandDetails && (
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="gradient-text flex items-center gap-2">
-                Brand Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  {brandDetails.logo_url && (
-                    <img
-                      src={brandDetails.logo_url}
-                      alt={brandDetails.name}
-                      className="w-16 h-16 rounded-lg object-contain"
-                    />
-                  )}
-                  <div>
-                    <h3 className="font-semibold text-lg">{brandDetails.name}</h3>
-                    <p className="text-muted-foreground">{brandDetails.industry}</p>
-                  </div>
-                </div>
+          <SectionCard title="Brand Details">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                {brandDetails.logo_url && (
+                  <img
+                    src={brandDetails.logo_url}
+                    alt={brandDetails.name}
+                    className="w-16 h-16 rounded-lg object-contain"
+                  />
+                )}
                 <div>
-                  <p className="text-sm text-muted-foreground">Mission</p>
-                  <p className="mt-1">{brandDetails.mission}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">Brand Values</p>
-                  <div className="flex flex-wrap gap-2">
-                    {brandDetails.values.map((value, index) => (
-                      <Badge key={index} variant="secondary">{value}</Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Target Market</p>
-                    <p className="font-medium">{brandDetails.target_market}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Brand Voice</p>
-                    <p className="font-medium">{brandDetails.brand_voice}</p>
-                  </div>
+                  <h3 className="font-semibold text-lg">{brandDetails.name}</h3>
+                  <p className="text-muted-foreground">{brandDetails.industry}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-sm text-muted-foreground">Mission</p>
+                <p className="mt-1">{brandDetails.mission}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Brand Values</p>
+                <div className="flex flex-wrap gap-2">
+                  {brandDetails.values.map((value, index) => (
+                    <Badge key={index} variant="secondary">{value}</Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Target Market</p>
+                  <p className="font-medium">{brandDetails.target_market}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Brand Voice</p>
+                  <p className="font-medium">{brandDetails.brand_voice}</p>
+                </div>
+              </div>
+            </div>
+          </SectionCard>
         )}
       </div>
 
       {/* Outreach List */}
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="gradient-text flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Active Outreach
-          </CardTitle>
-          <CardDescription>
-            {filteredEntries.length} creators in your pipeline
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {filteredEntries.map((entry) => {
-              const creator = creatorDetails[entry.creator_id];
-              return (
-                <div
-                  key={entry.id}
-                  onClick={() => navigate(`/conversation/${entry.id}`)}
-                  className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
-                >
-                  {creator?.profile_image ? (
-                    <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
-                      alt={creator.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-purple flex items-center justify-center text-white">
-                      <Users className="w-6 h-6" />
-                    </div>
-                  )}
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {creator?.name || `Creator ${entry.creator_id}`}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {creator?.channel_name || entry.channel}
-                        </p>
-                      </div>
-                      <Badge className={getStatusColor(entry.status)}>
-                        {entry.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{entry.message_type}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          Last contact: {new Date(entry.timestamp).toLocaleDateString()}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCall(entry);
-                          }}
-                          disabled={isCallLoading}
-                          className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                        >
-                          <Phone className="w-3 h-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEmail(entry);
-                          }}
-                          disabled={isEmailLoading}
-                          className="h-8 w-8 p-0 border-border hover:bg-secondary/20"
-                        >
-                          <Mail className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
+      <SectionCard title="Active Outreach">
+        <div className="space-y-3">
+          {filteredEntries.map((entry) => {
+            const creator = creatorDetails[entry.creator_id];
+            return (
+              <div
+                key={entry.id}
+                onClick={() => navigate(`/conversation/${entry.id}`)}
+                className="flex items-center gap-4 p-4 rounded-lg bg-secondary/10 border border-border hover:bg-secondary/20 transition-all duration-200 cursor-pointer"
+              >
+                {creator?.profile_image ? (
+                  <img
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
+                    alt={creator.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-purple flex items-center justify-center text-white">
+                    <Users className="w-6 h-6" />
                   </div>
+                )}
+                <div>
+                  <h4 className="font-medium">{creator?.name}</h4>
+                  <p className="text-sm text-muted-foreground">{creator?.niche}</p>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                <div className="ml-auto text-right">
+                  <p className="text-xs text-muted-foreground">{entry.status}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(entry.timestamp).toLocaleDateString()}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </SectionCard>
     </div>
   );
 };

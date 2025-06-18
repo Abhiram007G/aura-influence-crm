@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import SectionCard from "@/components/ui/SectionCard";
 
 // Campaign type
 interface Campaign {
@@ -223,14 +224,13 @@ const DiscoverInfluencer = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4">
-        <div>
+    <div className="space-y-8">
+      <SectionCard title="Discover Influencers" className="!mb-0">
+        <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold gradient-text">Discover Influencers</h1>
-          <p className="text-muted-foreground">Find and connect with creators that match your brand</p>
         </div>
-
-        {/* Search and Filter Bar */}
+      </SectionCard>
+      <SectionCard title="Search & Filter">
         <Card className="premium-card">
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
@@ -369,188 +369,188 @@ const DiscoverInfluencer = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Results */}
-      <Card className="premium-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Creator Discovery Results
-          </CardTitle>
-          <CardDescription>
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Searching creators...
-              </span>
-            ) : error ? (
-              <span className="text-red-500">Error loading creators: {error.message}</span>
-            ) : (
-              <span>Found {filteredCreators.length} creators matching your criteria</span>
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-slate-700/50">
-                  <TableHead className="w-16"></TableHead>
-                  <TableHead>Creator</TableHead>
-                  <TableHead>Platform</TableHead>
-                  <TableHead>Niche</TableHead>
-                  <TableHead>Followers</TableHead>
-                  <TableHead>Engagement</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                        <span>Loading creators...</span>
-                      </div>
-                    </TableCell>
+      </SectionCard>
+      <SectionCard title="Influencer List">
+        <Card className="premium-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Creator Discovery Results
+            </CardTitle>
+            <CardDescription>
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Searching creators...
+                </span>
+              ) : error ? (
+                <span className="text-red-500">Error loading creators: {error.message}</span>
+              ) : (
+                <span>Found {filteredCreators.length} creators matching your criteria</span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-700/50">
+                    <TableHead className="w-16"></TableHead>
+                    <TableHead>Creator</TableHead>
+                    <TableHead>Platform</TableHead>
+                    <TableHead>Niche</TableHead>
+                    <TableHead>Followers</TableHead>
+                    <TableHead>Engagement</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-red-500">
-                      Error loading creators: {error.message}
-                    </TableCell>
-                  </TableRow>
-                ) : filteredCreators.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      No creators found matching your criteria
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredCreators.map((creator) => {
-                    // Add console log to debug each creator
-                    console.log('Rendering creator:', creator);
-                    
-                    return (
-                      <TableRow 
-                        key={creator.id} 
-                        className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
-                      >
-                        <TableCell>
-                          <img
-                            src={creator.profile_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
-                            alt={creator.name}
-                            className="w-10 h-10 rounded-full object-cover  shadow-lg"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium text-foreground">{creator.name}</div>
-                            <div className="text-sm text-muted-foreground">@{creator.channel_name || creator.handle || 'N/A'}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-slate-600 capitalize">
-                            {creator.platform || 'N/A'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-slate-600">
-                            {creator.niche || 'N/A'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {creator.followers_count}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={`${getEngagementColor(creator.engagement_rate || 0)} text-white shadow-lg`}>
-                            {(creator.engagement_rate || 0).toFixed(1)}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {creator.country || 'N/A'}
-                        </TableCell>
-                        <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="hover-glow"
-                                onClick={() => {
-                                  setSelectedCreator(creator.id);
-                                  fetchCampaigns();
-                                }}
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Add to Campaign</DialogTitle>
-                                <DialogDescription>
-                                  Select a campaign to add {creator.name} to
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="grid gap-4 py-4">
-                                {loadingCampaigns ? (
-                                  <div className="flex items-center justify-center py-4">
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                  </div>
-                                ) : campaigns.length === 0 ? (
-                                  <div className="text-center space-y-4">
-                                    <p className="text-muted-foreground">No campaigns available</p>
-                                    <Button
-                                      onClick={() => navigate('/campaigns/new')}
-                                      className="bg-gradient-purple hover:opacity-90 text-white w-full"
-                                    >
-                                      <Plus className="w-4 h-4 mr-2" />
-                                      Create Campaign
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                      {campaigns.map((campaign) => (
-                                        <Button
-                                          key={campaign.id}
-                                          variant="outline"
-                                          className="justify-start h-auto py-3 px-4"
-                                          onClick={() => addCreatorToCampaign(campaign.id)}
-                                        >
-                                          <div className="flex flex-col items-start text-left">
-                                            <span className="font-medium text-foreground">{campaign.product_name}</span>
-                                            <span className="text-sm font-semibold gradient-text">{campaign.brand_name}</span>
-                                          </div>
-                                        </Button>
-                                      ))}
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                          <span>Loading creators...</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : error ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-red-500">
+                        Error loading creators: {error.message}
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredCreators.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No creators found matching your criteria
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCreators.map((creator) => {
+                      // Add console log to debug each creator
+                      console.log('Rendering creator:', creator);
+                      
+                      return (
+                        <TableRow 
+                          key={creator.id} 
+                          className="border-slate-700/30 hover:bg-slate-800/40 transition-colors"
+                        >
+                          <TableCell>
+                            <img
+                              src={creator.profile_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=Mike${encodeURIComponent(creator.name)}&background=6366f1&color=fff`}
+                              alt={creator.name}
+                              className="w-10 h-10 rounded-full object-cover  shadow-lg"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium text-foreground">{creator.name}</div>
+                              <div className="text-sm text-muted-foreground">@{creator.channel_name || creator.handle || 'N/A'}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-slate-600 capitalize">
+                              {creator.platform || 'N/A'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-slate-600">
+                              {creator.niche || 'N/A'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {creator.followers_count}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`${getEngagementColor(creator.engagement_rate || 0)} text-white shadow-lg`}>
+                              {(creator.engagement_rate || 0).toFixed(1)}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {creator.country || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="hover-glow"
+                                  onClick={() => {
+                                    setSelectedCreator(creator.id);
+                                    fetchCampaigns();
+                                  }}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Add to Campaign</DialogTitle>
+                                  <DialogDescription>
+                                    Select a campaign to add {creator.name} to
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  {loadingCampaigns ? (
+                                    <div className="flex items-center justify-center py-4">
+                                      <Loader2 className="w-6 h-6 animate-spin" />
                                     </div>
-                                    <div className="pt-2 border-t border-slate-700/50">
+                                  ) : campaigns.length === 0 ? (
+                                    <div className="text-center space-y-4">
+                                      <p className="text-muted-foreground">No campaigns available</p>
                                       <Button
-                                        className="w-full bg-gradient-purple hover:opacity-90 text-white"
                                         onClick={() => navigate('/campaigns/new')}
+                                        className="bg-gradient-purple hover:opacity-90 text-white w-full"
                                       >
                                         <Plus className="w-4 h-4 mr-2" />
-                                        Create New Campaign
+                                        Create Campaign
                                       </Button>
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                                  ) : (
+                                    <div className="space-y-4">
+                                      <div className="grid gap-2">
+                                        {campaigns.map((campaign) => (
+                                          <Button
+                                            key={campaign.id}
+                                            variant="outline"
+                                            className="justify-start h-auto py-3 px-4"
+                                            onClick={() => addCreatorToCampaign(campaign.id)}
+                                          >
+                                            <div className="flex flex-col items-start text-left">
+                                              <span className="font-medium text-foreground">{campaign.product_name}</span>
+                                              <span className="text-sm font-semibold gradient-text">{campaign.brand_name}</span>
+                                            </div>
+                                          </Button>
+                                        ))}
+                                      </div>
+                                      <div className="pt-2 border-t border-slate-700/50">
+                                        <Button
+                                          className="w-full bg-gradient-purple hover:opacity-90 text-white"
+                                          onClick={() => navigate('/campaigns/new')}
+                                        >
+                                          <Plus className="w-4 h-4 mr-2" />
+                                          Create New Campaign
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </SectionCard>
     </div>
   );
 };

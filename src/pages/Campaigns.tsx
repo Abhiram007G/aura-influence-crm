@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Megaphone, Plus, Users, Calendar, TrendingUp } from "lucide-react";
+import SectionCard from "@/components/ui/SectionCard";
 
 // API Response type
 interface CampaignResponse {
@@ -216,160 +217,167 @@ const Campaigns = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Campaigns</h1>
-          <p className="text-muted-foreground">
-            Manage and track your influencer marketing campaigns
-          </p>
-        </div>
-        <Button
-          onClick={() => navigate('/campaigns/new')}
-          className="bg-gradient-purple hover:opacity-90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 hover-glow"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Campaign
-        </Button>
-      </div>
-
-      {/* Status Filter Buttons */}
-      <div className="flex gap-2">
-        <Button
-          variant={!filters.status ? "default" : "outline"}
-          onClick={() => handleStatusFilter(undefined)}
-        >
-          All
-        </Button>
-        <Button
-          variant={filters.status === "active" ? "default" : "outline"}
-          onClick={() => handleStatusFilter("active")}
-        >
-          Active
-        </Button>
-        <Button
-          variant={filters.status === "planning" ? "default" : "outline"}
-          onClick={() => handleStatusFilter("planning")}
-        >
-          Planning
-        </Button>
-        <Button
-          variant={filters.status === "completed" ? "default" : "outline"}
-          onClick={() => handleStatusFilter("completed")}
-        >
-          Completed
-        </Button>
-        <Button
-          variant={filters.status === "paused" ? "default" : "outline"}
-          onClick={() => handleStatusFilter("paused")}
-        >
-          Paused
-        </Button>
-      </div>
-
-      {campaigns.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">No campaigns found</p>
+      <SectionCard title="Campaigns" className="!mb-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">Campaigns</h1>
+            <p className="text-muted-foreground">
+              Manage and track your influencer marketing campaigns
+            </p>
+          </div>
           <Button
             onClick={() => navigate('/campaigns/new')}
-            className="bg-gradient-purple hover:opacity-90 text-white"
+            className="bg-gradient-purple hover:opacity-90 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 hover-glow"
           >
-            Create Your First Campaign
+            <Plus className="w-4 h-4 mr-2" />
+            Create Campaign
           </Button>
         </div>
+      </SectionCard>
+
+      <SectionCard title="Status Filter" className="!mb-0">
+        <div className="flex gap-2">
+          <Button
+            variant={!filters.status ? "default" : "outline"}
+            onClick={() => handleStatusFilter(undefined)}
+          >
+            All
+          </Button>
+          <Button
+            variant={filters.status === "active" ? "default" : "outline"}
+            onClick={() => handleStatusFilter("active")}
+          >
+            Active
+          </Button>
+          <Button
+            variant={filters.status === "planning" ? "default" : "outline"}
+            onClick={() => handleStatusFilter("planning")}
+          >
+            Planning
+          </Button>
+          <Button
+            variant={filters.status === "completed" ? "default" : "outline"}
+            onClick={() => handleStatusFilter("completed")}
+          >
+            Completed
+          </Button>
+          <Button
+            variant={filters.status === "paused" ? "default" : "outline"}
+            onClick={() => handleStatusFilter("paused")}
+          >
+            Paused
+          </Button>
+        </div>
+      </SectionCard>
+
+      {campaigns.length === 0 ? (
+        <SectionCard>
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">No campaigns found</p>
+            <Button
+              onClick={() => navigate('/campaigns/new')}
+              className="bg-gradient-purple hover:opacity-90 text-white"
+            >
+              Create Your First Campaign
+            </Button>
+          </div>
+        </SectionCard>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {campaigns.map((campaign) => (
-              <Card key={campaign.id} className="glass-card hover-glow cursor-pointer transition-all duration-200">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 bg-gradient-purple rounded-lg flex items-center justify-center">
-                      <Megaphone className="w-5 h-5 text-white" />
-                    </div>
-                    <Badge className={getStatusColor(campaign.status)}>
-                      {campaign.status}
-                    </Badge>
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{campaign.name}</CardTitle>
-                    <CardDescription>{campaign.brand}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Budget</p>
-                      <p className="font-medium text-foreground">${campaign.budget.toLocaleString()}</p>
+          <SectionCard title="Campaign List">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {campaigns.map((campaign) => (
+                <Card key={campaign.id} className="glass-card hover-glow cursor-pointer transition-all duration-200">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="w-10 h-10 bg-gradient-purple rounded-lg flex items-center justify-center">
+                        <Megaphone className="w-5 h-5 text-white" />
+                      </div>
+                      <Badge className={getStatusColor(campaign.status)}>
+                        {campaign.status}
+                      </Badge>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Influencers</p>
-                      <p className="font-medium text-foreground flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {campaign.influencersCount}
-                      </p>
+                      <CardTitle className="text-lg">{campaign.name}</CardTitle>
+                      <CardDescription>{campaign.brand}</CardDescription>
                     </div>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Timeline</p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-3 h-3 text-muted-foreground" />
-                      <span>{new Date(campaign.startDate).toLocaleDateString()}</span>
-                      {campaign.endDate && (
-                        <>
-                          <span className="text-muted-foreground">-</span>
-                          <span>{new Date(campaign.endDate).toLocaleDateString()}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {campaign.status !== "planning" && (
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        Performance
-                      </p>
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="text-center p-2 rounded bg-secondary/10">
-                          <p className="font-medium text-foreground">{formatNumber(campaign.performance.reach)}</p>
-                          <p className="text-muted-foreground">Reach</p>
-                        </div>
-                        <div className="text-center p-2 rounded bg-secondary/10">
-                          <p className="font-medium text-foreground">{formatNumber(campaign.performance.engagement)}</p>
-                          <p className="text-muted-foreground">Engagement</p>
-                        </div>
-                        <div className="text-center p-2 rounded bg-secondary/10">
-                          <p className="font-medium text-foreground">{formatNumber(campaign.performance.conversions)}</p>
-                          <p className="text-muted-foreground">Conversions</p>
-                        </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Budget</p>
+                        <p className="font-medium text-foreground">${campaign.budget.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Influencers</p>
+                        <p className="font-medium text-foreground flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {campaign.influencersCount}
+                        </p>
                       </div>
                     </div>
-                  )}
 
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-border hover:bg-secondary/20"
-                      onClick={() => navigate(`/campaigns/${campaign.id}`)}
-                    >
-                      View Details
-                    </Button>
-                    {campaign.status === "planning" && (
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-gradient-blue hover:opacity-90 text-white"
-                        onClick={() => navigate(`/campaigns/${campaign.id}/influencers`)}
-                      >
-                        Find Influencers
-                      </Button>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Timeline</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-3 h-3 text-muted-foreground" />
+                        <span>{new Date(campaign.startDate).toLocaleDateString()}</span>
+                        {campaign.endDate && (
+                          <>
+                            <span className="text-muted-foreground">-</span>
+                            <span>{new Date(campaign.endDate).toLocaleDateString()}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {campaign.status !== "planning" && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          Performance
+                        </p>
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="text-center p-2 rounded bg-secondary/10">
+                            <p className="font-medium text-foreground">{formatNumber(campaign.performance.reach)}</p>
+                            <p className="text-muted-foreground">Reach</p>
+                          </div>
+                          <div className="text-center p-2 rounded bg-secondary/10">
+                            <p className="font-medium text-foreground">{formatNumber(campaign.performance.engagement)}</p>
+                            <p className="text-muted-foreground">Engagement</p>
+                          </div>
+                          <div className="text-center p-2 rounded bg-secondary/10">
+                            <p className="font-medium text-foreground">{formatNumber(campaign.performance.conversions)}</p>
+                            <p className="text-muted-foreground">Conversions</p>
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 border-border hover:bg-secondary/20"
+                        onClick={() => navigate(`/campaigns/${campaign.id}`)}
+                      >
+                        View Details
+                      </Button>
+                      {campaign.status === "planning" && (
+                        <Button
+                          size="sm"
+                          className="flex-1 bg-gradient-blue hover:opacity-90 text-white"
+                          onClick={() => navigate(`/campaigns/${campaign.id}/influencers`)}
+                        >
+                          Find Influencers
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </SectionCard>
 
           {/* Load More Button */}
           <div className="flex justify-center mt-8">

@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -70,9 +70,11 @@ export default {
 				'purple-gradient-end': '#693be3'
 			},
 			fontFamily: {
-				'baloo': ['Baloo Tamma 2', 'cursive'],
+				'outfit': ['Outfit', 'sans-serif'],
+				'baloo': ['Baloo 2', 'cursive'],
 				'glegoo': ['Glegoo', 'serif'],
 				'andika': ['Andika', 'sans-serif'],
+				'sans': ['Outfit', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -166,5 +168,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

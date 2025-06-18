@@ -9,6 +9,7 @@ import { findSimilarInfluencers, CampaignSimilarityResponse } from "@/lib/servic
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import SectionCard from "@/components/ui/SectionCard";
 
 interface CampaignDetails {
   id: string;
@@ -193,37 +194,39 @@ const CampaignDetails = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/campaigns')}
-            className="border-border hover:bg-secondary/20"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Campaigns
-          </Button>
-        </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold gradient-text">{campaign.product_name}</h1>
-            <p className="text-muted-foreground">{campaign.brand_name}</p>
-          </div>
+      <SectionCard title="Campaign Details" className="!mb-0">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <Button
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white"
-              onClick={() => setIsAutoPilotOpen(true)}
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/campaigns')}
+              className="border-border hover:bg-secondary/20"
             >
-              <Bot className="w-4 h-4 mr-2" />
-              Auto Co-Pilot
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Campaigns
             </Button>
-            <Badge className={getStatusColor(campaign.status)}>
-              {campaign.status}
-            </Badge>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold gradient-text">{campaign.product_name}</h1>
+              <p className="text-muted-foreground">{campaign.brand_name}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white"
+                onClick={() => setIsAutoPilotOpen(true)}
+              >
+                <Bot className="w-4 h-4 mr-2" />
+                Auto Co-Pilot
+              </Button>
+              <Badge className={getStatusColor(campaign.status)}>
+                {campaign.status}
+              </Badge>
+            </div>
           </div>
         </div>
-      </div>
+      </SectionCard>
 
       {/* Auto Pilot Dialog */}
       <Dialog open={isAutoPilotOpen} onOpenChange={setIsAutoPilotOpen}>
@@ -263,115 +266,70 @@ const CampaignDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Campaign Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {campaign.product_description && (
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Product Description</h4>
-                  <p className="text-muted-foreground">{campaign.product_description}</p>
-                </div>
-              )}
-              
-              {campaign.campaign_goal && (
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Campaign Goal</h4>
-                  <p className="text-muted-foreground">{campaign.campaign_goal}</p>
-                </div>
-              )}
-
-              {campaign.target_audience && (
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Target Audience</h4>
-                  <p className="text-muted-foreground">{campaign.target_audience}</p>
-                </div>
-              )}
-
-              {campaign.key_use_cases && (
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Key Use Cases</h4>
-                  <p className="text-muted-foreground">{campaign.key_use_cases}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <SectionCard title="Campaign Overview">
+            {campaign.product_description && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2">Product Description</h4>
+                <p className="text-muted-foreground">{campaign.product_description}</p>
+              </div>
+            )}
+            {campaign.campaign_goal && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2">Campaign Goal</h4>
+                <p className="text-muted-foreground">{campaign.campaign_goal}</p>
+              </div>
+            )}
+            {campaign.target_audience && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2">Target Audience</h4>
+                <p className="text-muted-foreground">{campaign.target_audience}</p>
+              </div>
+            )}
+            {campaign.key_use_cases && (
+              <div>
+                <h4 className="font-medium text-foreground mb-2">Key Use Cases</h4>
+                <p className="text-muted-foreground">{campaign.key_use_cases}</p>
+              </div>
+            )}
+          </SectionCard>
         </div>
 
         {/* Sidebar Stats */}
         <div className="space-y-6">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="text-lg">Campaign Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <SectionCard title="Campaign Stats">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-purple rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Budget</p>
+                <p className="font-semibold text-foreground">${campaign.total_budget.toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-blue rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Influencers</p>
+                <p className="font-semibold text-foreground">{campaign.influencer_count}</p>
+              </div>
+            </div>
+            {campaign.product_niche && (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-purple rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-cyan rounded-lg flex items-center justify-center">
+                  <Target className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Budget</p>
-                  <p className="font-semibold text-foreground">${campaign.total_budget.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">Niche</p>
+                  <p className="font-semibold text-foreground">{campaign.product_niche}</p>
                 </div>
               </div>
+            )}
+          </SectionCard>
 
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-blue rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Influencers</p>
-                  <p className="font-semibold text-foreground">{campaign.influencer_count}</p>
-                </div>
-              </div>
-
-              {campaign.product_niche && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-cyan rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Niche</p>
-                    <p className="font-semibold text-foreground">{campaign.product_niche}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-pink rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Created</p>
-                  <p className="font-semibold text-foreground">
-                    {new Date(campaign.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-
-              {campaign.campaign_code && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-orange rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Campaign Code</p>
-                    <p className="font-semibold text-foreground">{campaign.campaign_code}</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="text-lg">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <SectionCard title="Actions">
+            <div className="space-y-3">
               <Button
                 className="w-full bg-gradient-purple hover:opacity-90 text-white"
                 onClick={handleFindInfluencers}
@@ -397,8 +355,8 @@ const CampaignDetails = () => {
               >
                 View Influencers
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         </div>
       </div>
     </div>
