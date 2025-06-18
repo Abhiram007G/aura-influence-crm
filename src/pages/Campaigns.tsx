@@ -220,7 +220,7 @@ const Campaigns = () => {
 
   return (
     <div className="space-y-8">
-      <SectionCard title="Campaigns" className="!mb-0">
+      <SectionCard className="!mb-0">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold gradient-text">Campaigns</h1>

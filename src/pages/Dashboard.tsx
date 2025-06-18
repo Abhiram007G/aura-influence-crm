@@ -97,7 +97,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      <SectionCard title="Dashboard" className="!mb-0">
+      <SectionCard  className="!mb-0">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>

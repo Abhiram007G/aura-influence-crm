@@ -194,7 +194,7 @@ const CampaignDetails = () => {
 
   return (
     <div className="space-y-8">
-      <SectionCard title="Campaign Details" className="!mb-0">
+      <SectionCard className="!mb-0">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <Button

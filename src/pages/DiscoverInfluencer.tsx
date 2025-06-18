@@ -225,7 +225,7 @@ const DiscoverInfluencer = () => {
 
   return (
     <div className="space-y-8">
-      <SectionCard title="Discover Influencers" className="!mb-0">
+      <SectionCard className="!mb-0">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold gradient-text">Discover Influencers</h1>
         </div>
