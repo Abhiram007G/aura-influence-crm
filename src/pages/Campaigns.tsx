@@ -125,7 +125,7 @@ const Campaigns = () => {
         const data: CampaignResponse[] = await response.json();
         
         // Transform API response to UI format and fetch outreach counts
-        const transformedCampaigns: Campaign[] = await Promise.all(data.map(async campaign => {
+        let transformedCampaigns: Campaign[] = await Promise.all(data.map(async campaign => {
           const outreachCount = await fetchOutreachCount(campaign.id);
           return {
             id: campaign.id,
@@ -142,6 +142,9 @@ const Campaigns = () => {
             }
           };
         }));
+
+        // Sort campaigns by startDate (created_at) in descending order (latest first)
+        transformedCampaigns = transformedCampaigns.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
         setCampaigns(transformedCampaigns);
         setError(null);
