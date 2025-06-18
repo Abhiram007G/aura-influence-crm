@@ -25,6 +25,14 @@
     --input: 255 255 255;
     --ring: 105 59 227;
     --radius: 1rem;
+    --sidebar-background: 255 255 255;
+    --sidebar-foreground: 30 30 30;
+    --sidebar-primary: 105 59 227;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 177 156 255;
+    --sidebar-accent-foreground: 30 30 30;
+    --sidebar-border: 230 230 230;
+    --sidebar-ring: 105 59 227;
   }
 }
 
@@ -39,11 +47,11 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-baloo font-bold;
+    @apply font-baloo font-bold text-text-primary;
   }
   
   .subtitle, .highlight {
-    @apply font-glegoo;
+    @apply font-glegoo text-text-primary;
   }
 }
 
@@ -107,6 +115,61 @@
 
   .card-friendly {
     @apply bg-white rounded-3xl p-8 shadow-card hover-card-glow backdrop-blur-sm;
+  }
+
+  /* Status Colors */
+  .status-active {
+    @apply bg-green-100 text-green-800 border-green-200;
+  }
+
+  .status-pending {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  }
+
+  .status-completed {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+  }
+
+  .status-cancelled {
+    @apply bg-red-100 text-red-800 border-red-200;
+  }
+
+  .status-draft {
+    @apply bg-gray-100 text-gray-800 border-gray-200;
+  }
+
+  .status-initialized {
+    @apply bg-purple-100 text-purple-800 border-purple-200;
+  }
+
+  .status-call-initiated {
+    @apply bg-orange-100 text-orange-800 border-orange-200;
+  }
+
+  /* Engagement Rate Colors */
+  .engagement-high {
+    @apply bg-green-500 text-white;
+  }
+
+  .engagement-medium {
+    @apply bg-blue-500 text-white;
+  }
+
+  .engagement-low {
+    @apply bg-orange-500 text-white;
+  }
+
+  /* Text Utilities */
+  .text-visible {
+    @apply text-text-primary font-medium;
+  }
+
+  .text-secondary-visible {
+    @apply text-text-secondary font-normal;
+  }
+
+  .text-muted-visible {
+    @apply text-gray-600 font-normal;
   }
 
   .thinking-dots::after {

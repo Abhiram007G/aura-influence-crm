@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, MessageSquare, Target, TrendingUp, Loader2 } from "lucide-react";
+import { Brain, MessageSquare, Target, TrendingUp, Loader2, Star, Zap, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
@@ -21,7 +20,38 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-premium-gradient overflow-hidden">
+    <div className="min-h-screen bg-premium-gradient overflow-hidden relative">
+      {/* Subtle Background Pattern */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Icons Pattern */}
+        <div className="absolute top-20 left-10 text-white/10 animate-float">
+          <Star className="w-8 h-8" />
+        </div>
+        <div className="absolute top-32 right-20 text-white/5 animate-float" style={{ animationDelay: "-1s" }}>
+          <Zap className="w-12 h-12" />
+        </div>
+        <div className="absolute top-40 left-1/3 text-white/8 animate-float" style={{ animationDelay: "-3s" }}>
+          <Users className="w-6 h-6" />
+        </div>
+        <div className="absolute bottom-40 right-10 text-white/10 animate-float" style={{ animationDelay: "-2s" }}>
+          <Target className="w-10 h-10" />
+        </div>
+        <div className="absolute bottom-60 left-16 text-white/5 animate-float" style={{ animationDelay: "-4s" }}>
+          <MessageSquare className="w-8 h-8" />
+        </div>
+        <div className="absolute top-60 right-1/3 text-white/8 animate-float" style={{ animationDelay: "-1.5s" }}>
+          <Brain className="w-7 h-7" />
+        </div>
+        <div className="absolute bottom-20 left-1/2 text-white/6 animate-float" style={{ animationDelay: "-2.5s" }}>
+          <Calendar className="w-9 h-9" />
+        </div>
+        
+        {/* Gradient Orbs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "-4s" }} />
+      </div>
+
       {/* Video Modal */}
       <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
         <DialogContent className="sm:max-w-[800px] bg-white rounded-3xl">
@@ -37,13 +67,6 @@ const LandingPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "-2s" }} />
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "-4s" }} />
-      </div>
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/20 backdrop-blur-xl border-b border-white/20">
@@ -71,7 +94,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-4 text-center relative">
+      <section className="pt-40 pb-20 px-4 text-center relative z-10">
         <div className="max-w-5xl mx-auto space-y-8">
           <div 
             className={`inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/20 border border-white/30 text-white backdrop-blur-sm transform transition-all duration-700 ${
@@ -144,7 +167,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 relative">
+      <section id="features" className="py-20 px-4 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-baloo font-bold mb-6 text-white">Everything You Need to Scale</h2>
@@ -198,7 +221,7 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 px-4">
+      <section id="how-it-works" className="py-20 px-4 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-baloo font-bold mb-6 text-white">How It Works</h2>
@@ -241,7 +264,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 relative overflow-hidden">
+      <section className="py-20 px-4 relative overflow-hidden z-10">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-baloo font-bold mb-8 text-white">
             Ready to Transform Your Influencer Marketing?
@@ -259,7 +282,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/20 py-16 px-4 backdrop-blur-xl bg-white/10">
+      <footer className="border-t border-white/20 py-16 px-4 backdrop-blur-xl bg-white/10 relative z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             {
