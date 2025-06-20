@@ -361,7 +361,7 @@ const Campaigns = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 border-border hover:bg-secondary/20"
+                        className="flex-1 bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"
                         onClick={() => navigate(`/campaigns/${campaign.id}`)}
                       >
                         View Details

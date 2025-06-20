@@ -256,7 +256,7 @@ const CampaignDetails = () => {
               variant="outline"
               size="sm"
               onClick={() => navigate('/campaigns')}
-              className="border-border hover:bg-secondary/20"
+              className="bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Campaigns

@@ -139,7 +139,7 @@ const Dashboard = () => {
         <SectionCard title="Recent Campaigns">
           <div className="space-y-4">
             {recentCampaigns.map((campaign, index) => (
-              <div onClick={() => navigate(`/campaigns/${campaign.id}`)} key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border">
+              <div onClick={() => navigate(`/campaigns/${campaign.id}`)} key={index} className="flex items-center justify-between p-3 rounded-lg bg-white border border-slate-200 hover:shadow-card transition">
                 <div>
                   <p className="font-medium text-foreground">{campaign.product_name}</p>
                   <p className="text-sm text-muted-foreground">Budget: ${campaign.total_budget}</p>
