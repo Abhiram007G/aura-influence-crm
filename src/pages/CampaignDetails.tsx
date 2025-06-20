@@ -476,7 +476,7 @@ const CampaignDetails = () => {
               
               <Button
                 variant="outline"
-                className="w-full border-border hover:bg-secondary/20"
+                className="w-full bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"
                 onClick={() => navigate(`/campaign/${id}/irm`)}
               >
                 View Influencers

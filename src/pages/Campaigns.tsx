@@ -242,30 +242,35 @@ const Campaigns = () => {
         <div className="flex gap-2">
           <Button
             variant={!filters.status ? "default" : "outline"}
+            className={!filters.status ? undefined : "bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"}
             onClick={() => handleStatusFilter(undefined)}
           >
             All
           </Button>
           <Button
             variant={filters.status === "active" ? "default" : "outline"}
+            className={filters.status === "active" ? undefined : "bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"}
             onClick={() => handleStatusFilter("active")}
           >
             Active
           </Button>
           <Button
             variant={filters.status === "planning" ? "default" : "outline"}
+            className={filters.status === "planning" ? undefined : "bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"}
             onClick={() => handleStatusFilter("planning")}
           >
             Planning
           </Button>
           <Button
             variant={filters.status === "completed" ? "default" : "outline"}
+            className={filters.status === "completed" ? undefined : "bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"}
             onClick={() => handleStatusFilter("completed")}
           >
             Completed
           </Button>
           <Button
             variant={filters.status === "paused" ? "default" : "outline"}
+            className={filters.status === "paused" ? undefined : "bg-white border border-slate-200 text-text-primary hover:bg-secondary/20 hover:border-primary transition"}
             onClick={() => handleStatusFilter("paused")}
           >
             Paused
