@@ -186,11 +186,11 @@ export default function CampaignChatNew() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-3xl font-baloo font-bold text-slate-800">
-              Campaign Brief AI
+              AI Campaign Builder 
             </h1>
           </div>
           <p className="text-lg text-slate-600 font-andika max-w-2xl mx-auto">
-            Hello {userName}! Describe your campaign in natural language and I'll extract all the details to create your campaign.
+          Drop your brief in plain English. Get back a complete campaign in seconds.
           </p>
         </div>
       </div>

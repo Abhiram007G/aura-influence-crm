@@ -44,8 +44,8 @@ const App = () => {
                           <Route path="dashboard" element={<Dashboard />} />
                           <Route path="campaigns" element={<Campaigns />} />
                           <Route path="campaigns/:id" element={<CampaignDetails />} />
-                          <Route path="campaigns/new" element={<CampaignNew />} />
-                          <Route path="campaigns/chat-new" element={<CampaignChatNew />} />
+                          <Route path="campaigns/new" element={<CampaignChatNew />} />
+                          {/* <Route path="campaigns/chat-new" element={<CampaignChatNew />} /> */}
                           <Route path="campaigns/:id/influencers" element={<CampaignInfluencers />} />
                           <Route path="campaign/:id/irm" element={<CampaignIRM />} />
                           <Route path="conversation/:id" element={<ConversationDetails />} />

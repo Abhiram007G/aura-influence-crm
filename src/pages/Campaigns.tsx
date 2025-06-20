@@ -309,7 +309,7 @@ const Campaigns = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Budget</p>
-                        <p className="font-medium text-foreground">${campaign.budget.toLocaleString()}</p>
+                        <p className="font-medium text-foreground">₹ {campaign.budget.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Influencers</p>
