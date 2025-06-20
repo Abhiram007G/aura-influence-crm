@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import SectionCard from "@/components/ui/SectionCard";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useLogContext } from "@/lib/LogContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CampaignDetails {
   id: string;
@@ -28,6 +31,17 @@ interface CampaignDetails {
   updated_at: string;
 }
 
+// Animated Ellipsis component
+const AnimatedEllipsis = () => {
+  return (
+    <span className="inline-block text-3xl font-bold text-gray-500" style={{ letterSpacing: '2px' }}>
+      <span className="dot-anim">.</span>
+      <span className="dot-anim">.</span>
+      <span className="dot-anim">.</span>
+    </span>
+  );
+};
+
 const CampaignDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -39,6 +53,11 @@ const CampaignDetails = () => {
   const [isAutoPilotOpen, setIsAutoPilotOpen] = useState(false);
   const [currentPhase, setCurrentPhase] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+
+  // Use global log context
+  const { getLogs, startLogStream } = useLogContext();
+  const { logs, isStreaming, streamError } = getLogs(id || "");
 
   const phases = [
     {
@@ -122,6 +141,37 @@ const CampaignDetails = () => {
     }
   }, [isAutoPilotOpen]);
 
+  // Helper to parse stream lines
+  const parseStreamLine = (line: string) => {
+    try {
+      if (line.startsWith('data: ')) {
+        return JSON.parse(line.replace('data: ', ''));
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  };
+
+  // Open log sheet and trigger auto-pilot if needed
+  const handleAutoPilot = () => {
+    setIsAutoPilotOpen(true);
+    setIsLogSheetOpen(true);
+    if (id) startLogStream(id);
+  };
+  const handleLogsClick = () => {
+    setIsLogSheetOpen(true);
+  };
+
+  // Helper to format time in IST
+  const formatIST = (utcString: string) => {
+    const date = new Date(utcString);
+    // Convert to IST (UTC+5:30)
+    const istOffset = 5.5 * 60; // in minutes
+    const localTime = new Date(date.getTime() + (istOffset * 60 * 1000));
+    return localTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active": return "bg-green-500/20 text-green-400";
@@ -163,6 +213,11 @@ const CampaignDetails = () => {
       setFindingInfluencers(false);
     }
   };
+
+  // Helper to check if execution is completed
+  const isExecutionCompleted = logs.some(
+    (log) => log.status === 'completed' || log.progress === 100
+  );
 
   if (loading) {
     return (
@@ -212,13 +267,21 @@ const CampaignDetails = () => {
               <h1 className="text-3xl font-bold gradient-text">{campaign.product_name}</h1>
               <p className="text-muted-foreground">{campaign.brand_name}</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <Button
                 className="bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white"
-                onClick={() => setIsAutoPilotOpen(true)}
+                onClick={handleAutoPilot}
               >
                 <Bot className="w-4 h-4 mr-2" />
                 Auto Co-Pilot
+              </Button>
+              <Button
+                variant="ghost"
+                className="p-2"
+                onClick={handleLogsClick}
+                aria-label="Show Logs"
+              >
+                <FileText className="w-5 h-5 text-primary" />
               </Button>
               <Badge className={getStatusColor(campaign.status)}>
                 {campaign.status}
@@ -227,6 +290,69 @@ const CampaignDetails = () => {
           </div>
         </div>
       </SectionCard>
+
+      {/* Logs Bottom Sheet */}
+      <Sheet open={isLogSheetOpen} onOpenChange={setIsLogSheetOpen}>
+        <SheetContent side="bottom" className="max-h-[70vh] overflow-y-auto rounded-t-2xl p-0 sm:p-0">
+          <SheetHeader className="sticky top-0 z-10 bg-background p-4 border-b flex flex-row items-center justify-between">
+            <SheetTitle className="text-lg font-bold flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              Campaign Agent Logs
+            </SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-2 min-h-[200px] max-h-[60vh] overflow-y-auto">
+            {streamError && (
+              <div className="text-red-500 text-center">{streamError}</div>
+            )}
+            {logs.length === 0 && isStreaming && (
+              <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                Connecting to agent...
+              </div>
+            )}
+            {logs.map((log, idx) => {
+              const isLatest = idx === logs.length - 1 && isStreaming;
+              return (
+                <div key={idx} className="flex flex-col gap-1">
+                  <div className="flex items-start gap-2 text-sm">
+                    <div className={isLatest ? "shimmer-container" : undefined}>
+                      <span className={`font-medium${isLatest ? " shimmer-text" : ""}`}>
+                        {log.message}
+                      </span>
+                      {log.progress !== undefined && (
+                        <span className="ml-2 text-xs text-muted-foreground">({log.progress}%)</span>
+                      )}
+                      <div className="text-xs text-muted-foreground">{formatIST(log.timestamp)} IST</div>
+                    </div>
+                  </div>
+                  {/* Show creator details below the creators_found log */}
+                  {log.status === 'creators_found' && log.data && Array.isArray(log.data.creator_details) && log.data.creator_details.length > 0 && (
+                    <div className="ml-8 mt-1 flex flex-col gap-1">
+                      {log.data.creator_details.map((creator: any, cidx: number) => (
+                        <div key={creator.id || cidx} className="flex flex-wrap items-center gap-3 text-xs bg-muted/50 rounded px-2 py-1">
+                          <span className="font-semibold">👤 {creator.name}</span>
+                          <span>🏷️ {creator.niche}</span>
+                          <span>👥 {creator.followers.toLocaleString()} followers</span>
+                          <span>💰 ₹{creator.typical_rate}</span>
+                          <span>⭐ {Math.round(creator.match_score * 100)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            
+            {isExecutionCompleted && (
+              <div className="text-center text-green-600 font-semibold pt-2">Agent finished execution.</div>
+            )}
+          </div>
+          {/* Animated ellipsis at the bottom when streaming */}
+          {isStreaming && !isExecutionCompleted && (
+              <Skeleton className="h-4 w-[250px]" />
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Auto Pilot Dialog */}
       <Dialog open={isAutoPilotOpen} onOpenChange={setIsAutoPilotOpen}>
@@ -237,7 +363,7 @@ const CampaignDetails = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <h3 className="text-lg font-semibold text-center">
                 {phases[currentPhase].title}
               </h3>
@@ -246,7 +372,7 @@ const CampaignDetails = () => {
               </p>
             </div>
             
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-2" /> */}
             
             <div className="flex justify-center">
               <img 
