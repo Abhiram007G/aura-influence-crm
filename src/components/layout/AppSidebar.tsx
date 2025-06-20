@@ -1,4 +1,3 @@
-
 import { BarChart3, Megaphone, Users, Calendar, Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -41,7 +40,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar className="border-r border-white/20 bg-white/95 backdrop-blur-xl shadow-card">
+    <Sidebar className="border-r border-white/20 bg-white backdrop-blur-xl shadow-card">
       <SidebarHeader className="p-6 border-b border-white/20" onClick={() => navigate("/")}>
         <div className="flex items-center gap-3 cursor-pointer">
           <div className="w-10 h-10 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
