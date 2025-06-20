@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { createCampaign, CampaignCreate } from "@/lib/services/campaignService";
 import { config } from "@/lib/config";
 import { Groq } from "groq-sdk";
 import { Textarea } from "@/components/ui/textarea";
+import { Send, Sparkles, Loader2 } from "lucide-react";
 
 const SYSTEM_PROMPT = `
 You are an intelligent assistant that converts influencer marketing campaign briefs written in natural language into a structured JSON format. The campaign briefs are given by brand or agency teams and may include product info, deliverables, influencer requirements, and budgets.
@@ -99,7 +99,7 @@ export default function CampaignChatNew() {
   const [parsed, setParsed] = useState<any | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const userName = "Abhiram"; // You can make this dynamic if you have user context
+  const userName = "Abhiram";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,57 +177,166 @@ export default function CampaignChatNew() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[100vh] w-full bg-background font-outfit">
-      {/* Greeting Section */}
-      <div className="flex flex-col items-center mb-8 mt-8">
-        <span className="text-4xl md:text-5xl font-serif font-semibold bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end bg-clip-text text-transparent flex items-center gap-2">
-          <span className="text-primary">✳️</span> How was your day, {userName}?
-        </span>
-        <span className="mt-2 text-lg md:text-xl text-muted-foreground text-center max-w-xl font-outfit">
-          Ready to launch your next influencer campaign? Describe your brief below and let our AI do the rest!
-        </span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50/30 flex flex-col">
+      {/* Header */}
+      <div className="w-full max-w-4xl mx-auto px-6 py-8">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end rounded-full flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-3xl font-baloo font-bold text-slate-800">
+              Campaign Brief AI
+            </h1>
+          </div>
+          <p className="text-lg text-slate-600 font-andika max-w-2xl mx-auto">
+            Hello {userName}! Describe your campaign in natural language and I'll extract all the details to create your campaign.
+          </p>
+        </div>
       </div>
-      {/* Main Card */}
-      <Card className="w-full max-w-2xl shadow-premium rounded-3xl border-0 bg-gradient-primary">
-        <CardHeader className="text-center border-b border-border pb-2">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end bg-clip-text text-transparent font-outfit">AI Campaign Brief</CardTitle>
-          <CardDescription className="font-outfit">
-            Type your campaign brief in natural language. Our AI will extract all the details!
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col items-center gap-6 py-8">
-            <Textarea
-              className="premium-input text-lg py-7 px-5 text-center rounded-2xl shadow-md border-2 border-primary focus:border-secondary bg-background placeholder:text-muted-foreground font-outfit min-h-[120px] resize-y"
-              placeholder="Describe your campaign like you would to ChatGPT..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isLoading}
-              autoFocus
-              required
-              rows={6}
-            />
-            <Button
-              type="submit"
-              className="premium-button px-10 py-4 text-lg font-semibold rounded-xl shadow-lg bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end text-white hover:from-primary hover:to-secondary transition-all duration-200 font-outfit"
-              disabled={isLoading || !input.trim()}
-            >
-              {isLoading ? "Thinking..." : "Generate & Create Campaign"}
-            </Button>
-          </form>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 w-full max-w-4xl mx-auto px-6 pb-8">
+        <div className="space-y-6">
+          {/* Input Area */}
+          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="relative">
+                  <Textarea
+                    className="min-h-[140px] resize-none border-2 border-slate-200 rounded-xl px-4 py-3 text-base placeholder:text-slate-500 focus:border-primary focus:ring-0 font-andika bg-white"
+                    placeholder="Describe your campaign brief here... Include details about your product, target audience, budget, deliverables, and goals."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-slate-500 font-andika">
+                    {input.length > 0 && `${input.length} characters`}
+                  </div>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isLoading || !input.trim()}
+                    className="bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end hover:from-purple-600 hover:to-purple-700 text-white px-8 py-2.5 rounded-xl font-baloo font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Generate Campaign
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Loading State */}
+          {isLoading && (
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-50 to-blue-50 border-l-4 border-l-primary">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-gradient-start to-purple-gradient-end rounded-full flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 text-white animate-spin" />
+                  </div>
+                  <div>
+                    <div className="font-baloo font-semibold text-slate-800 mb-1">
+                      Analyzing your campaign brief...
+                    </div>
+                    <div className="text-sm text-slate-600 font-andika">
+                      Extracting product details, audience, budget, and goals
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Error State */}
           {error && (
-            <div className="mt-4 text-center text-destructive text-lg font-medium animate-pulse bg-rose-950/60 rounded-xl p-4 border border-destructive font-outfit">
-              {error}
-            </div>
+            <Card className="border-0 shadow-lg bg-red-50 border-l-4 border-l-red-400">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-red-600 text-sm font-bold">!</span>
+                  </div>
+                  <div>
+                    <div className="font-baloo font-semibold text-red-800 mb-2">
+                      Missing Information
+                    </div>
+                    <div className="text-sm text-red-700 font-andika whitespace-pre-line">
+                      {error}
+                    </div>
+                    {missingFields.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {missingFields.map((field) => (
+                          <span
+                            key={field}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                          >
+                            {fieldLabels[field] || field}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
+
+          {/* Success State */}
           {parsed && !error && (
-            <div className="mt-8 bg-background rounded-xl p-6 text-left text-base shadow-inner border border-border font-outfit">
-              <div className="font-semibold mb-2 text-primary">Extracted Campaign Details:</div>
-              <pre className="whitespace-pre-wrap break-words text-foreground text-sm md:text-base font-outfit">{JSON.stringify(parsed, null, 2)}</pre>
-            </div>
+            <Card className="border-0 shadow-lg bg-green-50 border-l-4 border-l-green-400">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-green-600 text-sm">✓</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-baloo font-semibold text-green-800 mb-2">
+                      Campaign Details Extracted Successfully!
+                    </div>
+                    <div className="text-sm text-green-700 font-andika mb-4">
+                      Here's what I found in your brief:
+                    </div>
+                    
+                    <div className="bg-white rounded-lg p-4 border border-green-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        {Object.entries(parsed).map(([key, value]) => (
+                          <div key={key} className="space-y-1">
+                            <div className="font-medium text-slate-700 font-glegoo">
+                              {fieldLabels[key] || key}:
+                            </div>
+                            <div className="text-slate-600 font-andika">
+                              {typeof value === 'string' ? value : JSON.stringify(value)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="w-full max-w-4xl mx-auto px-6 py-4">
+        <div className="text-center text-sm text-slate-500 font-andika">
+          Powered by AI • Describe your campaign naturally and let our AI do the rest
+        </div>
+      </div>
     </div>
   );
-} 
+}
