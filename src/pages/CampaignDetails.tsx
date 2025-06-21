@@ -429,7 +429,7 @@ const CampaignDetails = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Budget</p>
-                <p className="font-semibold text-foreground">${campaign.total_budget.toLocaleString()}</p>
+                <p className="font-semibold text-foreground">₹{campaign.total_budget.toLocaleString()}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
