@@ -1,4 +1,4 @@
-import { BarChart3, Megaphone, Users, Calendar, Search } from "lucide-react";
+import { BarChart3, Megaphone, Users, Calendar, Search, ExternalLink } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -76,6 +76,29 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+          <SidebarGroupLabel className="text-xs font-glegoo font-medium text-text-secondary uppercase tracking-wider px-3 py-2">
+            Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  asChild
+                  className="hover:bg-secondary/30 transition-all duration-200 rounded-xl"
+                >
+                  <a
+                    href="https://adsynth-frontend.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center gap-3 p-4 rounded-xl transition-all duration-200 font-andika font-medium"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                    <span>Adsynth</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
